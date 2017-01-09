@@ -1,6 +1,6 @@
-const test = [
+const test1 = [
 {
 'testvar': 'testvarval'
 }]
 
-export default test;
+export default test1;

@@ -1,4 +1,4 @@
-function testReducer(state = [], action) {
+function test1(state = [], action) {
 
 	switch(action.type) {
 		case "TEST":
@@ -9,4 +9,4 @@ function testReducer(state = [], action) {
 	return state;
 }
 
-export default testReducer;
+export default test1;

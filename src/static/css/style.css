@@ -1,0 +1,172 @@
+.navigation {
+	background-color: red;
+	height: 30px;
+}
+
+.contest-container {
+	background-color: blue;
+	height: 500px;
+}
+
+.contest-table-container {
+	background-color: green;
+}
+
+.contest-table {
+	background-color: yellow;
+	margin: 0 auto;
+	width: 60%;
+}
+
+.make-your-own {
+	margin: 0 auto;
+}
+
+.descriptor {
+	background-color: blue;
+}
+
+.contest-left {
+	background-color: yellow;
+	float: left;
+	height: 50px;
+	width: 50%;
+}
+
+.contest-right {
+	background-color: green;
+	float: left;
+	height: 50px;
+	width: 40%;
+	margin-left: 75px;
+
+}
+
+.main-left-right-container {
+	width: 90%;
+	margin: 0 auto;
+}
+
+.contest-name-hover:hover {
+	color: blue;
+	text-decoration: underline;
+}
+
+.navbar li {
+	display: inline;
+	float: left;
+	width: 20%;
+}
+
+a {
+	color: black;
+	text-decoration: none;
+}
+
+.navbar {
+	width: 100%;
+}
+
+.stocks, .history, .leader-board {
+	display: inline;
+	border: solid;
+	border-width: 2px 2px 2px 2px;
+	padding: 3px;
+}
+.stocks, .history, .leader-board:hover {
+	cursor: pointer;
+}
+
+.company-name, .share-number, .current-value {
+	margin: 0 auto;
+}
+
+.single-contest-table {
+	width: 100%;
+}
+
+.single-contest-table-row {
+	width: 100%;
+}
+
+.rowdata {
+	width: 33%;
+	background-color: red;
+}
+
+.sorters {
+	margin-bottom: 20px;
+}
+
+.transactions-table {
+	width: 100%;
+}
+
+.transaction-contest-table-row {
+	width: 100%;
+}
+
+@media (max-width: 865px) {
+  .contest-left {
+    width: 45%;
+    margin-left: -20px;
+  }
+}
+
+.hidden {
+	display: none;
+}
+
+.open {
+	display: inline;
+}
+
+.active-contest-table {
+	margin: 0 auto;
+	width: 45%;
+}
+
+
+.toggle-div-shown {
+	background-color: green;
+	height: 200px;
+	width: 200px;
+}
+
+.toggle-div-hidden {
+	background-color: red;
+	height: 200px;
+	width: 200px;
+}
+
+
+input[type=text] {
+    width: 130px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+    float: right;
+}
+
+/* When the input field gets focus, change its width to 100% */
+input[type=text]:focus {
+    width: 50%;
+}
+
+.modal-input-contest-name {
+	float: left !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

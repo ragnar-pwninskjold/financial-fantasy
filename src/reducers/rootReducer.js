@@ -1,13 +1,43 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
+import {reducer as modalReducer} from 'react-redux-modal'
 
-import testReducer from './testreducer';
-import testReducer2 from './testreducer2';
+
+import test1 from './testreducer';
+import contestTableTest from './contestTableTest';
+import toggleReducer from './toggleReducer';
+import activeData from './activeDataReducer';
+import historyData from './historyDataReducer';
+import historyTable from './historyTableReducer';
+import leaderboard from './leaderboardReducer';
+import searchYield from './searchYieldReducer';
+import singleContestPositions from './singleContestPositionsReducer';
+import { reducer as formReducer } from 'redux-form';  
+import authReducer from './authenticationReducer';
+import buyStock from './buyStockReducer';
+import makeEntry from './entryReducer';
+
 
 //import the reducers here
 
 //put the reducers into the combineReducers
 
-const rootReducer = combineReducers({testReducer, testReducer2, routing: routerReducer});
+const rootReducer = combineReducers({
+	test1, 
+	contestTableTest, 
+	buyStock,
+	modals: modalReducer, 
+	toggleReducer,
+	activeData,
+	historyData,
+	historyTable,
+	leaderboard,
+	searchYield,
+	makeEntry,
+	singleContestPositions,
+	auth: authReducer,
+	form: formReducer, 
+	routing: routerReducer
+});
 
 export default rootReducer;

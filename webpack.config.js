@@ -2,18 +2,21 @@ const webpack = require ('webpack');
 const path = require('path');
 
 module.exports = {
-	entry: path.join(__dirname, 'src', 'client.js'),
+	devtool: "source-map",
+	entry: path.join(__dirname, 'src', 'routes.js'),
 	output: {
-		path: path.join(__dirname, 'src', 'static', 'js'),
+		devtoolLineToLine: true,
+		sourceMapFileName: './bundle.js.map',
+		path: path.join(__dirname, 'src', 'static'),
 		filename: 'bundle.js'
-	},
+		},
 	module: {
 		loaders: [{
-			test: path.join(__dirname, 'src'),
-			loader: ['babel-loader'],
+			test: /\.jsx?$/,
+			exclude: /(node_mdules)/,
+			loader: 'babel-loader',
 			query: {
-				cacheDirectory: 'babel-cache',
-				presets: ['react', 'es2015']
+				presets: ['react', 'es2015', 'stage-2']
 			}
 		}]
 	},
@@ -30,5 +33,6 @@ module.exports = {
 			beautify: false,
 			dead_code: true
 		})
+
 	]
 };

@@ -3,9 +3,12 @@ import {Server} from 'http';
 import Express from 'express';
 import React from 'react';
 import {renderToString} from 'react-dom/server';
-import {match, RouterContext} from 'react-router';
+import {match, RouterContext, RoutingContext} from 'react-router';
+import createMemoryHistory from 'history/lib/createMemoryHistory';
+import Promise from 'bluebird';
 import routes from './routes';
 import PageNotFound from './components/PageNotFound';
+import Index from './components/Index';
 
 import passport from 'passport';
 import mongoose from 'mongoose';
@@ -14,12 +17,16 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import session from 'express-session';
+import { Provider } from 'react-redux';
+import store from './store';
+import {Route, IndexRoute, Router, hashHistory} from 'react-router';
+
+const router = require('./router');  
 
 
 
 mongoose.connect(configDB.url); //configure database
 
-// require('./config/passport')(passport); //pass passport to configure with db
 
 
 const app = new Express();
@@ -28,54 +35,23 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(Express.static(path.join(__dirname, 'static')));
+
 app.use(morgan('dev')); //logs requests to console
 app.use(cookieParser()); //reads cookies for authentication
-app.use(bodyParser());
-app.use(session({secret: "awesomesecret"}));
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());  
+
 
 require('./serverroutes.js')(app);
 
+app.get('*', function(req, res) {
 
-// app.get('/foofoo', function(req, res) {
-// 		res.json("foooooooo");
-// });
+	res.sendFile(path.join(__dirname + '/static/index.html'));
 
-app.get('*', (req, res) => {
-	console.log("caught it");
-	match(
-		{routes, location: req.url},
-		(err, redirectLocation, renderProps) => {
-			if(err) {
-				console.log("error caught");
-				return res.status(500).send(err.message);
-			}
-			if(redirectLocation) {
-				console.log("inside 302");
-				return res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-			}
-
-			let markup;
-			if (renderProps) {
-				console.log("inside renderProps");
-				markup = renderToString(<RouterContext {...renderProps}/>);
-			}
-			else {
-				console.log("inside PageNotFound");
-				markup = renderToString(<PageNotFound/>);
-				res.status(404);
-			}
-			console.log("right before rendering index");
-			return res.render('index', {markup});
-		}
-
-	);
-	console.log("outside of match function");
 });
 
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 7770;
 const env = process.env.NODE_ENV || 'production';
 server.listen(port, err => {
 	if (err) {
@@ -85,4 +61,13 @@ server.listen(port, err => {
 	console.info(`Server running on http://localhost:${port} [${env}]`);
 });
 
+app.use(function(req, res, next) {  
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Credentials");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
+router(app);  
 

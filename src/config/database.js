@@ -1,5 +1,6 @@
 module.exports = {
 
-    'url' : 'mongodb://default:default@ds129038.mlab.com:29038/plutus'
+    'url' : 'mongodb://default:default@ds129038.mlab.com:29038/plutus',
+    'secret': 'somecoolsecret'
 
 };

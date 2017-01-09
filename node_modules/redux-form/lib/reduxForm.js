@@ -1,0 +1,654 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _mapValues2 = require('lodash/mapValues');
+
+var _mapValues3 = _interopRequireDefault(_mapValues2);
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var _react = require('react');
+
+var _hoistNonReactStatics = require('hoist-non-react-statics');
+
+var _hoistNonReactStatics2 = _interopRequireDefault(_hoistNonReactStatics);
+
+var _reactRedux = require('react-redux');
+
+var _redux = require('redux');
+
+var _isPromise = require('is-promise');
+
+var _isPromise2 = _interopRequireDefault(_isPromise);
+
+var _getDisplayName = require('./util/getDisplayName');
+
+var _getDisplayName2 = _interopRequireDefault(_getDisplayName);
+
+var _actions = require('./actions');
+
+var importedActions = _interopRequireWildcard(_actions);
+
+var _handleSubmit = require('./handleSubmit');
+
+var _handleSubmit2 = _interopRequireDefault(_handleSubmit);
+
+var _silenceEvent = require('./events/silenceEvent');
+
+var _silenceEvent2 = _interopRequireDefault(_silenceEvent);
+
+var _silenceEvents = require('./events/silenceEvents');
+
+var _silenceEvents2 = _interopRequireDefault(_silenceEvents);
+
+var _asyncValidation = require('./asyncValidation');
+
+var _asyncValidation2 = _interopRequireDefault(_asyncValidation);
+
+var _hasErrors = require('./hasErrors');
+
+var _hasErrors2 = _interopRequireDefault(_hasErrors);
+
+var _hasError = require('./hasError');
+
+var _hasError2 = _interopRequireDefault(_hasError);
+
+var _defaultShouldAsyncValidate = require('./defaultShouldAsyncValidate');
+
+var _defaultShouldAsyncValidate2 = _interopRequireDefault(_defaultShouldAsyncValidate);
+
+var _plain = require('./structure/plain');
+
+var _plain2 = _interopRequireDefault(_plain);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+var isClassComponent = function isClassComponent(Component) {
+  return Boolean(Component && Component.prototype && _typeof(Component.prototype.isReactComponent) === 'object');
+};
+
+// extract field-specific actions
+var arrayInsert = importedActions.arrayInsert;
+var arrayPop = importedActions.arrayPop;
+var arrayPush = importedActions.arrayPush;
+var arrayRemove = importedActions.arrayRemove;
+var arrayShift = importedActions.arrayShift;
+var arraySplice = importedActions.arraySplice;
+var arraySwap = importedActions.arraySwap;
+var arrayUnshift = importedActions.arrayUnshift;
+var blur = importedActions.blur;
+var change = importedActions.change;
+var focus = importedActions.focus;
+
+var formActions = _objectWithoutProperties(importedActions, ['arrayInsert', 'arrayPop', 'arrayPush', 'arrayRemove', 'arrayShift', 'arraySplice', 'arraySwap', 'arrayUnshift', 'blur', 'change', 'focus']);
+
+var arrayActions = {
+  arrayInsert: arrayInsert,
+  arrayPop: arrayPop,
+  arrayPush: arrayPush,
+  arrayRemove: arrayRemove,
+  arrayShift: arrayShift,
+  arraySplice: arraySplice,
+  arraySwap: arraySwap,
+  arrayUnshift: arrayUnshift
+};
+
+var propsToNotUpdateFor = [].concat(_toConsumableArray(Object.keys(importedActions)), ['array', 'asyncErrors', 'initialized', 'initialValues', 'syncErrors', 'values', 'registeredFields']);
+
+var checkSubmit = function checkSubmit(submit) {
+  if (!submit || typeof submit !== 'function') {
+    throw new Error('You must either pass handleSubmit() an onSubmit function or pass onSubmit as a prop');
+  }
+  return submit;
+};
+
+/**
+ * The decorator that is the main API to redux-form
+ */
+var createReduxForm = function createReduxForm(structure) {
+  var deepEqual = structure.deepEqual;
+  var empty = structure.empty;
+  var getIn = structure.getIn;
+  var setIn = structure.setIn;
+  var fromJS = structure.fromJS;
+  var some = structure.some;
+
+  var hasErrors = (0, _hasErrors2.default)(structure);
+  var hasError = (0, _hasError2.default)(structure);
+  var plainHasErrors = (0, _hasErrors2.default)(_plain2.default);
+  return function (initialConfig) {
+    var config = _extends({
+      touchOnBlur: true,
+      touchOnChange: false,
+      destroyOnUnmount: true,
+      shouldAsyncValidate: _defaultShouldAsyncValidate2.default,
+      enableReinitialize: false,
+      getFormState: function getFormState(state) {
+        return getIn(state, 'form');
+      }
+    }, initialConfig);
+    return function (WrappedComponent) {
+      var Form = function (_Component) {
+        _inherits(Form, _Component);
+
+        function Form(props) {
+          _classCallCheck(this, Form);
+
+          var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Form).call(this, props));
+
+          _this.submit = _this.submit.bind(_this);
+          _this.reset = _this.reset.bind(_this);
+          _this.asyncValidate = _this.asyncValidate.bind(_this);
+          _this.getValues = _this.getValues.bind(_this);
+          _this.register = _this.register.bind(_this);
+          _this.unregister = _this.unregister.bind(_this);
+          _this.submitCompleted = _this.submitCompleted.bind(_this);
+          return _this;
+        }
+
+        _createClass(Form, [{
+          key: 'getChildContext',
+          value: function getChildContext() {
+            var _this2 = this;
+
+            return {
+              _reduxForm: _extends({}, this.props, {
+                getFormState: function getFormState(state) {
+                  return getIn(_this2.props.getFormState(state), _this2.props.form);
+                },
+                asyncValidate: this.asyncValidate,
+                getValues: this.getValues,
+                register: this.register,
+                unregister: this.unregister
+              })
+            };
+          }
+        }, {
+          key: 'initIfNeeded',
+          value: function initIfNeeded(nextProps) {
+            if (nextProps) {
+              var enableReinitialize = this.props.enableReinitialize;
+
+              if ((enableReinitialize || !nextProps.initialized) && !deepEqual(this.props.initialValues, nextProps.initialValues)) {
+                this.props.initialize(nextProps.initialValues);
+              }
+            } else if (this.props.initialValues) {
+              this.props.initialize(this.props.initialValues);
+            }
+          }
+        }, {
+          key: 'updateSyncErrorsIfNeeded',
+          value: function updateSyncErrorsIfNeeded(nextSyncErrors) {
+            var _props = this.props;
+            var syncErrors = _props.syncErrors;
+            var updateSyncErrors = _props.updateSyncErrors;
+
+            var noErrors = !syncErrors || !Object.keys(syncErrors).length;
+            var nextNoErrors = !nextSyncErrors || !Object.keys(nextSyncErrors).length;
+            if (!(noErrors && nextNoErrors) && !_plain2.default.deepEqual(syncErrors, nextSyncErrors)) {
+              updateSyncErrors(nextSyncErrors);
+            }
+          }
+        }, {
+          key: 'validateIfNeeded',
+          value: function validateIfNeeded(nextProps) {
+            var _props2 = this.props;
+            var validate = _props2.validate;
+            var values = _props2.values;
+
+            if (validate) {
+              if (nextProps) {
+                // not initial render
+                if (!deepEqual(values, nextProps.values)) {
+                  var nextSyncErrors = validate(nextProps.values, nextProps);
+                  this.updateSyncErrorsIfNeeded(nextSyncErrors);
+                }
+              } else {
+                // initial render
+                var _nextSyncErrors = validate(values, this.props);
+                this.updateSyncErrorsIfNeeded(_nextSyncErrors);
+              }
+            }
+          }
+        }, {
+          key: 'componentWillMount',
+          value: function componentWillMount() {
+            this.initIfNeeded();
+            this.validateIfNeeded();
+          }
+        }, {
+          key: 'componentWillReceiveProps',
+          value: function componentWillReceiveProps(nextProps) {
+            this.initIfNeeded(nextProps);
+            this.validateIfNeeded(nextProps);
+          }
+        }, {
+          key: 'shouldComponentUpdate',
+          value: function shouldComponentUpdate(nextProps) {
+            var _this3 = this;
+
+            return Object.keys(nextProps).some(function (prop) {
+              // useful to debug rerenders
+              // if (!plain.deepEqual(this.props[ prop ], nextProps[ prop ])) {
+              //   console.info(prop, 'changed', this.props[ prop ], '==>', nextProps[ prop ])
+              // }
+              return !~propsToNotUpdateFor.indexOf(prop) && !deepEqual(_this3.props[prop], nextProps[prop]);
+            });
+          }
+        }, {
+          key: 'componentWillUnmount',
+          value: function componentWillUnmount() {
+            var _props3 = this.props;
+            var destroyOnUnmount = _props3.destroyOnUnmount;
+            var destroy = _props3.destroy;
+
+            if (destroyOnUnmount) {
+              this.destroyed = true;
+              destroy();
+            }
+          }
+        }, {
+          key: 'getValues',
+          value: function getValues() {
+            return this.props.values;
+          }
+        }, {
+          key: 'isValid',
+          value: function isValid() {
+            return this.props.valid;
+          }
+        }, {
+          key: 'isPristine',
+          value: function isPristine() {
+            return this.props.pristine;
+          }
+        }, {
+          key: 'register',
+          value: function register(name, type) {
+            this.props.registerField(name, type);
+          }
+        }, {
+          key: 'unregister',
+          value: function unregister(name) {
+            if (!this.destroyed) {
+              this.props.unregisterField(name);
+            }
+          }
+        }, {
+          key: 'getFieldList',
+          value: function getFieldList() {
+            return this.props.registeredFields.map(function (field) {
+              return getIn(field, 'name');
+            });
+          }
+        }, {
+          key: 'asyncValidate',
+          value: function asyncValidate(name, value) {
+            var _this4 = this;
+
+            var _props4 = this.props;
+            var asyncBlurFields = _props4.asyncBlurFields;
+            var asyncErrors = _props4.asyncErrors;
+            var asyncValidate = _props4.asyncValidate;
+            var dispatch = _props4.dispatch;
+            var initialized = _props4.initialized;
+            var pristine = _props4.pristine;
+            var shouldAsyncValidate = _props4.shouldAsyncValidate;
+            var startAsyncValidation = _props4.startAsyncValidation;
+            var stopAsyncValidation = _props4.stopAsyncValidation;
+            var syncErrors = _props4.syncErrors;
+            var values = _props4.values;
+
+            var submitting = !name;
+            if (asyncValidate) {
+              var _ret = function () {
+                var valuesToValidate = submitting ? values : setIn(values, name, value);
+                var syncValidationPasses = submitting || !getIn(syncErrors, name);
+                var isBlurredField = !submitting && (!asyncBlurFields || ~asyncBlurFields.indexOf(name.replace(/\[[0-9]+\]/g, '[]')));
+                if ((isBlurredField || submitting) && shouldAsyncValidate({
+                  asyncErrors: asyncErrors,
+                  initialized: initialized,
+                  trigger: submitting ? 'submit' : 'blur',
+                  blurredField: name,
+                  pristine: pristine,
+                  syncValidationPasses: syncValidationPasses
+                })) {
+                  return {
+                    v: (0, _asyncValidation2.default)(function () {
+                      return asyncValidate(valuesToValidate, dispatch, _this4.props);
+                    }, startAsyncValidation, stopAsyncValidation, name)
+                  };
+                }
+              }();
+
+              if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            }
+          }
+        }, {
+          key: 'submitCompleted',
+          value: function submitCompleted(result) {
+            delete this.submitPromise;
+            return result;
+          }
+        }, {
+          key: 'listenToSubmit',
+          value: function listenToSubmit(promise) {
+            var _this5 = this;
+
+            if (!(0, _isPromise2.default)(promise)) {
+              return promise;
+            }
+            this.submitPromise = promise;
+            return promise.then(this.submitCompleted, function (err) {
+              _this5.submitCompleted();
+              return Promise.reject(err);
+            });
+          }
+        }, {
+          key: 'submit',
+          value: function submit(submitOrEvent) {
+            var _this6 = this;
+
+            var onSubmit = this.props.onSubmit;
+
+
+            if (!submitOrEvent || (0, _silenceEvent2.default)(submitOrEvent)) {
+              // submitOrEvent is an event: fire submit if not already submitting
+              if (!this.submitPromise) {
+                return this.listenToSubmit((0, _handleSubmit2.default)(checkSubmit(onSubmit), this.props, this.isValid(), this.asyncValidate, this.getFieldList()));
+              }
+            } else {
+              // submitOrEvent is the submit function: return deferred submit thunk
+              return (0, _silenceEvents2.default)(function () {
+                return !_this6.submitPromise && _this6.listenToSubmit((0, _handleSubmit2.default)(checkSubmit(submitOrEvent), _this6.props, _this6.isValid(), _this6.asyncValidate, _this6.getFieldList()));
+              });
+            }
+          }
+        }, {
+          key: 'reset',
+          value: function reset() {
+            this.props.reset();
+          }
+        }, {
+          key: 'render',
+          value: function render() {
+            // remove some redux-form config-only props
+            /* eslint-disable no-unused-vars */
+            var _props5 = this.props;
+            var anyTouched = _props5.anyTouched;
+            var arrayInsert = _props5.arrayInsert;
+            var arrayPop = _props5.arrayPop;
+            var arrayPush = _props5.arrayPush;
+            var arrayRemove = _props5.arrayRemove;
+            var arrayShift = _props5.arrayShift;
+            var arraySplice = _props5.arraySplice;
+            var arraySwap = _props5.arraySwap;
+            var arrayUnshift = _props5.arrayUnshift;
+            var asyncErrors = _props5.asyncErrors;
+            var asyncValidate = _props5.asyncValidate;
+            var asyncValidating = _props5.asyncValidating;
+            var destroy = _props5.destroy;
+            var destroyOnUnmount = _props5.destroyOnUnmount;
+            var dirty = _props5.dirty;
+            var dispatch = _props5.dispatch;
+            var enableReinitialize = _props5.enableReinitialize;
+            var error = _props5.error;
+            var form = _props5.form;
+            var getFormState = _props5.getFormState;
+            var initialize = _props5.initialize;
+            var invalid = _props5.invalid;
+            var pristine = _props5.pristine;
+            var propNamespace = _props5.propNamespace;
+            var registerField = _props5.registerField;
+            var reset = _props5.reset;
+            var submitting = _props5.submitting;
+            var submitFailed = _props5.submitFailed;
+            var touch = _props5.touch;
+            var touchOnBlur = _props5.touchOnBlur;
+            var touchOnChange = _props5.touchOnChange;
+            var syncErrors = _props5.syncErrors;
+            var unregisterField = _props5.unregisterField;
+            var untouch = _props5.untouch;
+            var valid = _props5.valid;
+            var values = _props5.values;
+
+            var rest = _objectWithoutProperties(_props5, ['anyTouched', 'arrayInsert', 'arrayPop', 'arrayPush', 'arrayRemove', 'arrayShift', 'arraySplice', 'arraySwap', 'arrayUnshift', 'asyncErrors', 'asyncValidate', 'asyncValidating', 'destroy', 'destroyOnUnmount', 'dirty', 'dispatch', 'enableReinitialize', 'error', 'form', 'getFormState', 'initialize', 'invalid', 'pristine', 'propNamespace', 'registerField', 'reset', 'submitting', 'submitFailed', 'touch', 'touchOnBlur', 'touchOnChange', 'syncErrors', 'unregisterField', 'untouch', 'valid', 'values']);
+            /* eslint-enable no-unused-vars */
+
+
+            var reduxFormProps = {
+              anyTouched: anyTouched,
+              asyncValidate: asyncValidate,
+              asyncValidating: asyncValidating,
+              destroy: destroy,
+              dirty: dirty,
+              dispatch: dispatch,
+              error: error,
+              form: form,
+              handleSubmit: this.submit,
+              initialize: initialize,
+              invalid: invalid,
+              pristine: pristine,
+              reset: reset,
+              submitting: submitting,
+              submitFailed: submitFailed,
+              touch: touch,
+              untouch: untouch,
+              valid: valid
+            };
+            var propsToPass = _extends({}, propNamespace ? _defineProperty({}, propNamespace, reduxFormProps) : reduxFormProps, rest);
+            if (isClassComponent(WrappedComponent)) {
+              propsToPass.ref = 'wrapped';
+            }
+            return (0, _react.createElement)(WrappedComponent, propsToPass);
+          }
+        }]);
+
+        return Form;
+      }(_react.Component);
+
+      Form.displayName = 'Form(' + (0, _getDisplayName2.default)(WrappedComponent) + ')';
+      Form.WrappedComponent = WrappedComponent;
+      Form.childContextTypes = {
+        _reduxForm: _react.PropTypes.object.isRequired
+      };
+      Form.propTypes = {
+        destroyOnUnmount: _react.PropTypes.bool,
+        form: _react.PropTypes.string.isRequired,
+        initialValues: _react.PropTypes.object,
+        getFormState: _react.PropTypes.func,
+        onSubmitFail: _react.PropTypes.func,
+        onSubmitSuccess: _react.PropTypes.func,
+        propNameSpace: _react.PropTypes.string,
+        validate: _react.PropTypes.func,
+        touchOnBlur: _react.PropTypes.bool,
+        touchOnChange: _react.PropTypes.bool,
+        registeredFields: _react.PropTypes.any
+      };
+
+      var connector = (0, _reactRedux.connect)(function (state, props) {
+        var form = props.form;
+        var getFormState = props.getFormState;
+        var initialValues = props.initialValues;
+
+        var formState = getIn(getFormState(state) || empty, form) || empty;
+        var stateInitial = getIn(formState, 'initial');
+        var initial = initialValues || stateInitial || empty;
+        var values = getIn(formState, 'values') || initial;
+        var pristine = deepEqual(initial, values);
+        var asyncErrors = getIn(formState, 'asyncErrors');
+        var submitErrors = getIn(formState, 'submitErrors');
+        var syncErrors = getIn(formState, 'syncErrors');
+        var hasSyncErrors = plainHasErrors(syncErrors);
+        var hasAsyncErrors = hasErrors(asyncErrors);
+        var hasSubmitErrors = hasErrors(submitErrors);
+        var registeredFields = getIn(formState, 'registeredFields') || [];
+        var hasFieldWithError = registeredFields && some(registeredFields, function (field) {
+          return hasError(field, syncErrors, asyncErrors, submitErrors);
+        });
+        var valid = !hasSyncErrors && !hasAsyncErrors && !hasSubmitErrors && !hasFieldWithError;
+        var anyTouched = !!getIn(formState, 'anyTouched');
+        var submitting = !!getIn(formState, 'submitting');
+        var submitFailed = !!getIn(formState, 'submitFailed');
+        var error = getIn(formState, 'error');
+        return {
+          anyTouched: anyTouched,
+          asyncErrors: asyncErrors,
+          asyncValidating: getIn(formState, 'asyncValidating'),
+          dirty: !pristine,
+          error: error,
+          initialized: !!stateInitial,
+          invalid: !valid,
+          pristine: pristine,
+          registeredFields: registeredFields,
+          submitting: submitting,
+          submitFailed: submitFailed,
+          syncErrors: syncErrors,
+          values: values,
+          valid: valid
+        };
+      }, function (dispatch, initialProps) {
+        var bindForm = function bindForm(actionCreator) {
+          return actionCreator.bind(null, initialProps.form);
+        };
+
+        // Bind the first parameter on `props.form`
+        var boundFormACs = (0, _mapValues3.default)(formActions, bindForm);
+        var boundArrayACs = (0, _mapValues3.default)(arrayActions, bindForm);
+        var boundBlur = function boundBlur(field, value) {
+          return blur(initialProps.form, field, value, !!initialProps.touchOnBlur);
+        };
+        var boundChange = function boundChange(field, value) {
+          return change(initialProps.form, field, value, !!initialProps.touchOnChange);
+        };
+        var boundFocus = bindForm(focus);
+
+        // Wrap action creators with `dispatch`
+        var connectedFormACs = (0, _redux.bindActionCreators)(boundFormACs, dispatch);
+        var connectedArrayACs = {
+          insert: (0, _redux.bindActionCreators)(boundArrayACs.arrayInsert, dispatch),
+          pop: (0, _redux.bindActionCreators)(boundArrayACs.arrayPop, dispatch),
+          push: (0, _redux.bindActionCreators)(boundArrayACs.arrayPush, dispatch),
+          remove: (0, _redux.bindActionCreators)(boundArrayACs.arrayRemove, dispatch),
+          shift: (0, _redux.bindActionCreators)(boundArrayACs.arrayShift, dispatch),
+          splice: (0, _redux.bindActionCreators)(boundArrayACs.arraySplice, dispatch),
+          swap: (0, _redux.bindActionCreators)(boundArrayACs.arraySwap, dispatch),
+          unshift: (0, _redux.bindActionCreators)(boundArrayACs.arrayUnshift, dispatch)
+        };
+
+        var computedActions = _extends({}, connectedFormACs, boundArrayACs, {
+          blur: boundBlur,
+          change: boundChange,
+          array: connectedArrayACs,
+          focus: boundFocus,
+          dispatch: dispatch
+        });
+
+        return function () {
+          return computedActions;
+        };
+      }, undefined, { withRef: true });
+      var ConnectedForm = (0, _hoistNonReactStatics2.default)(connector(Form), WrappedComponent);
+      ConnectedForm.defaultProps = config;
+
+      // build outer component to expose instance api
+      return function (_Component2) {
+        _inherits(ReduxForm, _Component2);
+
+        function ReduxForm() {
+          _classCallCheck(this, ReduxForm);
+
+          return _possibleConstructorReturn(this, Object.getPrototypeOf(ReduxForm).apply(this, arguments));
+        }
+
+        _createClass(ReduxForm, [{
+          key: 'submit',
+          value: function submit() {
+            return this.refs.wrapped.getWrappedInstance().submit();
+          }
+        }, {
+          key: 'reset',
+          value: function reset() {
+            return this.refs.wrapped.getWrappedInstance().reset();
+          }
+        }, {
+          key: 'render',
+          value: function render() {
+            var _props6 = this.props;
+            var initialValues = _props6.initialValues;
+
+            var rest = _objectWithoutProperties(_props6, ['initialValues']);
+
+            return (0, _react.createElement)(ConnectedForm, _extends({}, rest, {
+              ref: 'wrapped',
+              // convert initialValues if need to
+              initialValues: fromJS(initialValues)
+            }));
+          }
+        }, {
+          key: 'valid',
+          get: function get() {
+            return this.refs.wrapped.getWrappedInstance().isValid();
+          }
+        }, {
+          key: 'invalid',
+          get: function get() {
+            return !this.valid;
+          }
+        }, {
+          key: 'pristine',
+          get: function get() {
+            return this.refs.wrapped.getWrappedInstance().isPristine();
+          }
+        }, {
+          key: 'dirty',
+          get: function get() {
+            return !this.pristine;
+          }
+        }, {
+          key: 'values',
+          get: function get() {
+            return this.refs.wrapped.getWrappedInstance().getValues();
+          }
+        }, {
+          key: 'fieldList',
+          get: function get() {
+            // mainly provided for testing
+            return this.refs.wrapped.getWrappedInstance().getFieldList();
+          }
+        }, {
+          key: 'wrappedInstance',
+          get: function get() {
+            // for testine
+            return this.refs.wrapped.getWrappedInstance().refs.wrapped;
+          }
+        }]);
+
+        return ReduxForm;
+      }(_react.Component);
+    };
+  };
+};
+
+exports.default = createReduxForm;

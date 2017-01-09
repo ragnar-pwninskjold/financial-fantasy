@@ -4,11 +4,19 @@ import * as actionCreators from '../actions/actioncreators';
 import Main from './Main';
 
 
+
+//put all of the test data files in here
 function mapStateToProps(state) {
 	return {
-		test: state.test,
-		test2: state.test2
-	}
+		test1: state.test1,
+		contestTableTest: state.contestTableTest,
+		activeData: state.activeData,
+		historyData: state.historyData,
+		historyTable: state.historyTable,
+		leaderboard: state.leaderboard,
+		searchYield: state.searchYield,
+		singleContestPositions: state.singleContestPositions
+		}
 }
 
 function mapDispatchToProps(dispatch) {
