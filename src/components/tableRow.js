@@ -20,10 +20,14 @@ export default class TableRow extends React.Component {
 	}
 
 	render() {
+		let contest = this.props.contestTableTest[0][this.props.i];
+		console.log("contest------", contest);
+		let contestants = this.props.contestTableTest[0][this.props.i].contestants;
+		console.log("contestants-----", contestants);
 		return (
 			<tr>
 				<td className="contest-name-hover">{this.props.contestTableTest[0][this.props.i].title}</td>
-				<td>{this.props.contestTableTest[0][this.props.i].participantCount}/ {this.props.contestTableTest[0][this.props.i].participantCount}</td>
+				<td>{this.props.contestTableTest[0][this.props.i].contestants.length}/ {this.props.contestTableTest[0][this.props.i].participantCount}</td>
 				<td>${this.props.contestTableTest[0][this.props.i].buyIn}</td>
 				<td>${this.props.contestTableTest[0][this.props.i].prizeTotals}</td>
 				<td><button onClick={this.handleClick.bind(this, "4")}>Enter contest</button></td>

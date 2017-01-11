@@ -16,11 +16,15 @@ const download = require('download-file');
 
 module.exports = function(app) {
 
+	updateLeaderboard();
+
+
 	let date = new Date();
 	let day = date.getDay();
 	let hour = date.getHours();
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
+	console.log("hourMin", hourMin);
 
 	/*
 
@@ -35,8 +39,8 @@ module.exports = function(app) {
 	*/
 
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
-		console.log('cron job running every 15 mins, mon-fri 9:30 - 4');
-		if ((day != 0 || 6) && (hourMin >= 9.5 && hour < 16)){
+		console.log('cron job running every 15 mins, mon-fri 9:45 - 4');
+		if ((day !== 0 || day !== 6) && (hourMin >= 9.75 && hourMin < 16)){
 			updateNYSE();
 			updateNASDAQ();
 		}
@@ -66,13 +70,21 @@ module.exports = function(app) {
 	}, false);
 
 	var closeActive = new CronJob('00 05 16 * * 1-5', function(){
-		//turns on all contests to active
+		//turns off all contests to closed
 		console.log('cron job running at 4:05 monday through friday to make untradeable contests tradeable (it was opened during trading hours)');
 		Contest.update({status: 'active'}, {$set: {status: 'closed'}}, {multi: true},function(err, data) {
 			if (err) {
 				console.log("errors in turning all active to closed----", err);
 			}
 		});
+
+	}, false);
+
+	var leaderUpdate = new CronJob('*/15 * * * *', function(){
+		console.log('cron job running every 15 mins, mon-fri 10 - 4');
+		if ((day != 0 || day !=6) && (hourMin >= 10 && hour < 16)){
+			//update leaderboard
+		}
 
 	}, false);
 
@@ -83,27 +95,23 @@ module.exports = function(app) {
 	makeActive.start();
 	makeTradeable.start();
 	closeActive.start();
+	leaderUpdate.start();
 	//updateleaderboard start();
 	//close positions start();
 
 	app.post('/api/contests/:contestid/buy/:stock', function(req, res) {
 		let contest = req.params.contestid;
 		let stock = req.params.stock;
-		console.log("contest-------", contest);
-		console.log("stock---------", stock);
-		console.log("req--------", req.body);
+	
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
 
 		Entries.find({ $and: [{userId: userId}, {contestOpen: true}, {contestId: contest}]}, function(err, data) {
-			console.log("Entries data", data);
 			var balance = data[0].balance;
 			if (!err) {
 				Company.findOne({ticker: stock}, function(err, data) {
 					let price = data.price;
-					console.log("volume", req.body.volume);
-					console.log("price", price);
-					console.log("value", (price*req.body.volume));
+				
 					let value = price*req.body.volume;
 					
 					if (!err) {
@@ -183,10 +191,8 @@ module.exports = function(app) {
 		let userId = userInfo._id;
 		let contest = req.params.contest;
 		Position.find({ $and: [{contestId: contest}, {userId: userId}, {isOpen: true}]}, function(err, data) {
-			console.log("all active positions err----", err);
-			console.log("finding all active positions ------", data);
+			
 			if (data.length == 0) {
-				console.log("data.length was 0")
 				res.json([{
 										position: [{
 											name: null,
@@ -204,6 +210,7 @@ module.exports = function(app) {
 
 	app.get('/api/getContestList', function(req, res) {
 		Contest.find({ $or: [{status: 'pending_but_can_make_trades'}, {status: 'pending_but_cannot_make_trades'}]}, function(err, data) {
+			console.log("data from get contest list", data);
 			res.json(data);
 		});
 	});
@@ -219,19 +226,14 @@ module.exports = function(app) {
 
 	app.post('/api/contestcreate', function(req, res) {
 		let contestParameters = req.body;
-		console.log(contestParameters);
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
-		console.log("user id", userId);
 		let date = new Date();
 		let day = date.getDay();
 		let hour = date.getHours();
 		let minutes = (date.getMinutes())/60;
 		let hourMin = hour+minutes;
-		console.log("day----", day);
-		console.log("hour----", hour);
-		console.log("minutes -------", minutes);
-		console.log("hourMin", hourMin);
+	
 		if (day == 0 || day == 6) {
 			var status = 'pending_but_can_make_trades';
 		}
@@ -281,6 +283,32 @@ module.exports = function(app) {
 
 }
 
+function updateLeaderboard() {
+
+	Contest.find({status: 'active'}, function(err, data) {
+		console.log("data from inside updateLeaderboard", data);
+		for (var i = 0; i < data.length; i++) {
+			let contest = data[i]._id;
+			Position.find({$and: [{isOpen: true}, {contestId: contest}]}, function(err, data) {
+				console.log("position.find inside of updateLeaderboard", data);
+				var userArray = [];
+				for (var j = 0; j < data.length; j++) {
+					console.log("data i inside of Position.find, inside of update leaderBoard-----------------", j);
+					console.log("actual data inside of Position.find", data);
+					if (userArray.contains(data[j].userId)) {
+						continue;
+					}
+					else {
+						userArray.push(data[j].userId);
+					}
+				}
+				console.log("userArray----------------",userArray);
+			});
+
+		}
+	});
+}
+
 function updateNYSE() {
 
 let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NYSE&render=download";
@@ -294,11 +322,11 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 		csv()
 		.fromFile('./files/nyse.xlsx')
 		.on('json', (jsonObj) => {
-			console.log("jsonObj--------------", jsonObj);
 			Company.update({ticker: jsonObj.Symbol},{
 				price: jsonObj.LastSale
 			}, function(err, data) {
-				console.log(data);
+				//nothing
+				//need to update positions for value with new price
 			});
 		})
 		.on('done', (error) => {
@@ -321,11 +349,11 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 		csv()
 		.fromFile('./files/nasdaq.xlsx')
 		.on('json', (jsonObj) => {
-			console.log("jsonObj--------------", jsonObj);
+			//nothing
 			Company.update({ticker: jsonObj.Symbol},{
 				price: jsonObj.LastSale
 			}, function(err, data) {
-				console.log(data);
+				//nothing
 			});
 		})
 		.on('done', (error) => {
@@ -333,4 +361,14 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 		});
 
 		});
+}
+
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] == obj) {
+            return true;
+        }
+    }
+    return false;
 }
