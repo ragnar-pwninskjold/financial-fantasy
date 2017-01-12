@@ -12,21 +12,27 @@ import rootReducer from './reducers/rootReducer.js';
 import test1 from './data/testdata';
 import contestTableTest from './data/contestTableData';
 import activeData from './data/activeData';
-import historyData from './data/historyData';
+import receiveHistoryData from './data/historyData';
 import historyTable from './data/historyTable';
 import leaderboard from './data/leaderboardData';
 import searchYield from './data/searchYieldData';
 import singleContestPositions from './data/singleContestPositions';
+import receiveCash from './data/cash';
+import receiveAcctBal from './data/receiveAcctBal';
+import receiveEntryClose from './data/receiveEntryCloseData';
 
 const defaultState = {
 	test1,
 	contestTableTest,
 	activeData,
-	historyData,
+	receiveHistoryData,
 	historyTable,
 	leaderboard,
 	searchYield,
-	singleContestPositions
+	singleContestPositions,
+	receiveCash,
+	receiveAcctBal,
+	receiveEntryClose
 };
 
 // const persistedState = localStorage.getItem('reduxState') ? JSON.parse(localStorage.getItem('reduxState')) : {}

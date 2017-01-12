@@ -1,8 +1,8 @@
-const historyData = [
+const receiveHistoryData = [
 {
-'contestName': 'XYZ Named Contest',
+'title': 'XYZ Named Contest',
 'position': '1st',
-'buy-in': '$25',
+'buyIn': '$25',
 'winnings': '$100'
 },
 {
@@ -12,4 +12,4 @@ const historyData = [
 'winnings': '$0'
 }]
 
-export default historyData;
+export default receiveHistoryData;

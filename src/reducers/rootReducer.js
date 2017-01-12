@@ -16,6 +16,12 @@ import { reducer as formReducer } from 'redux-form';
 import authReducer from './authenticationReducer';
 import buyStock from './buyStockReducer';
 import makeEntry from './entryReducer';
+import closeEntry from './closeEntryReducer';
+import receiveCash from './receiveCashReducer';
+import receiveAcctBal from './receiveAcctBal';
+import receiveEntryClose from './receiveEntryCloseReducer';
+import receiveMessages from './receiveMessagesReducer';
+
 
 
 //import the reducers here
@@ -35,6 +41,11 @@ const rootReducer = combineReducers({
 	searchYield,
 	makeEntry,
 	singleContestPositions,
+	closeEntry,
+	receiveCash,
+	receiveAcctBal,
+	receiveEntryClose,
+	receiveMessages,
 	auth: authReducer,
 	form: formReducer, 
 	routing: routerReducer

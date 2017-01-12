@@ -7,7 +7,8 @@ const singleContestPositions = [
 	name: null,
 	volume: null,
 	price: null,
-	value: null
+	value: null, 
+	id: null
 }]
 }],
 {

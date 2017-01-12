@@ -11,11 +11,14 @@ function mapStateToProps(state) {
 		test1: state.test1,
 		contestTableTest: state.contestTableTest,
 		activeData: state.activeData,
-		historyData: state.historyData,
+		historyData: state.receiveHistoryData,
 		historyTable: state.historyTable,
 		leaderboard: state.leaderboard,
 		searchYield: state.searchYield,
-		singleContestPositions: state.singleContestPositions
+		singleContestPositions: state.singleContestPositions,
+		cash: state.receiveCash,
+		accountBalance: state.receiveAcctBal,
+		receivedMessage: state.receiveMessages
 		}
 }
 

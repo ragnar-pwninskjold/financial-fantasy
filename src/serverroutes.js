@@ -16,7 +16,7 @@ const download = require('download-file');
 
 module.exports = function(app) {
 
-	updateLeaderboard();
+	// updateLeaderboard();
 
 
 	let date = new Date();
@@ -81,7 +81,7 @@ module.exports = function(app) {
 	}, false);
 
 	var leaderUpdate = new CronJob('*/15 * * * *', function(){
-		console.log('cron job running every 15 mins, mon-fri 10 - 4');
+		console.log('cron job running every 15 mins to update leaderboard, mon-fri 10 - 4');
 		if ((day != 0 || day !=6) && (hourMin >= 10 && hour < 16)){
 			//update leaderboard
 		}
@@ -106,8 +106,16 @@ module.exports = function(app) {
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
 
-		Entries.find({ $and: [{userId: userId}, {contestOpen: true}, {contestId: contest}]}, function(err, data) {
-			var balance = data[0].balance;
+
+		Entries.findOne({ $and: [{userId: userId}, {contestOpen: true}, {contestId: contest}]}, function(err, data) {
+			console.log("data from inside Entries.find", data);
+			if (data.entryStatus == 'closed') {
+				console.log("BECAUSE IT WAS CLOSED");
+				res.json("ENTRY_CLOSED");
+			}
+			else {
+			console.log("DATA--------------", data);
+			var balance = data.balance;
 			if (!err) {
 				Company.findOne({ticker: stock}, function(err, data) {
 					let price = data.price;
@@ -130,7 +138,7 @@ module.exports = function(app) {
 								var newBalance = balance - value;
 								Entries.findOneAndUpdate({$and: [{userId: userId}, {contestOpen: true}, {contestId: contest}]}, {balance: newBalance}, function(err, data) {
 									console.log("err in updating entry balance--------", err);
-									res.json("success");
+									res.json("SUCCESS");
 								});
 							});
 						}
@@ -149,7 +157,7 @@ module.exports = function(app) {
 				console.log("there was an error in finding company", err);
 				res.json(err);
 			}
-			
+			}
 		});
 
 		
@@ -168,21 +176,137 @@ module.exports = function(app) {
 		});
 	});
 
+	app.get('/api/getcash/:contest', function(req, res) {
+		let userInfo = jwtDecode(req.cookies.token);
+		let userId = userInfo._id;
+		let contest = req.params.contest;
+	
+		Entries.findOne({ $and: [{userId: userId}, {contestId: contest}, {contestOpen: true}]}, function(err, data) {
+			console.log("inside of contest get cash");
+			res.json(data.balance);
+		});
+	});
+
 	app.post('/api/entry/:contest', function(req, res) {
-		console.log(req.params);
+		let status = req.body.status;
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
 		let contestId = req.params.contest;
+		console.log("inside of entry create----------------------------------");
 		Entries.create({
 			userId,
 			contestId,
-			contestOpen: true
+			contestOpen: true,
+			canAddPositions: true,
+			entryStatus: status
 		}, function(err, data) {
 			console.log("err in entry create------", err);
 		});
 		Contest.update({'_id': contestId}, {$push: {contestants: userId}}, function(err, data) {
 			console.log("err in pushing user to contest----", err);
 			console.log("data from pushing to user to contest----", data);
+		});
+	});
+
+	app.post('/api/entry/close/:contest', function(req, res) {
+		let userInfo = jwtDecode(req.cookies.token);
+		let userId = userInfo._id;
+		let contestId = req.params.contest;
+		var contestBuyIn;
+		var userBalance;
+		User.findOne({_id: userId}, function(err, data) {
+			console.log("data inside of the User.find -------------------", data)
+			userBalance = data.accountBalance;
+			Contest.findOne({_id: contestId}, function(err, data) {
+				contestBuyIn = data.buyIn;
+				console.log("data inside of contest.find----------------", data);
+				if (userBalance - contestBuyIn < 0) {
+					throw new Error('TEST!');
+					res.json("NOT_ENOUGH_ACCOUNT_FUNDS");
+					return;
+				}
+				else {
+					console.log("inside of else statement ------------------------");
+					console.log("userBalance", userBalance);
+					console.log("contestBuyIn", contestBuyIn);
+					var newBalance = userBalance - contestBuyIn;
+					console.log("newBalance", newBalance);
+					User.update({_id: userId}, {accountBalance: newBalance}, function(err, data) {
+						//do nothing
+					});
+				}
+			});
+		});
+		Entries.findOneAndUpdate({ $and: [{userId: userId}, {contestId: contestId}, {entryStatus: 'pending'}]}, {entryStatus: 'closed'}, function(err, data) {
+			console.log("error in closing contest-------", err);
+			res.json("CLOSED");
+		});
+	});
+
+	app.get('/api/getMessages/:contest', function(req, res) {
+		let contest = req.params.contest;
+		let userInfo = jwtDecode(req.cookies.token);
+		let userId = userInfo._id;
+		Contest.findOne({_id: contest}, function(err, data) {
+			console.log("data in getMessage -----------------", data);
+			var status = data.status;
+			Entries.findOne({ $and: [{contestId: contest}, {userId: userId}]}, function(err, data) {
+				var entryStatus = data.entryStatus;
+				console.log("status inside of getMessages", status);
+				console.log("status inside of Entries inside of get Messages", entryStatus);
+				if (status == 'pending_but_cannot_make_trades') {
+					res.json("PENDING_NO_TRADES");
+				}
+				else if (status == 'active') {
+					res.json("ACTIVE_CONTEST");
+				}
+				else if (status == 'closed') {
+					res.json("CONTEST_CLOSED");
+				}
+				else if (entryStatus == 'closed') {
+					res.json("ENTRY_CLOSED");
+				}
+				else if (status == 'pending_but_can_make_trades') {
+					res.json("GOOD_TO_TRADE");
+				}
+				else {
+					console.log("inside of get messages, something unforseen happened");
+				}
+			});
+		})
+		/*
+		OPTIONS:
+		1. pending_but_cannot_make_trades (market is active)
+		2. ENTRY_CLOSED
+		3. CONTEST_CLOSED
+		4. Actiev
+		*/
+	});
+
+	app.put('/api/position/delete/:id', function(req, res) {
+		let positionId = req.params.id;
+		let value = req.body.value;
+		
+		let userInfo = jwtDecode(req.cookies.token);
+		let userId = userInfo._id;
+		let contest = req.body.contest;
+		Position.remove({_id: positionId}, function(err, data) {
+			console.log("error in deleting position------", err);
+		});
+		Entries.findOneAndUpdate({ $and: [{userId: userId}, {contestId: contest}, {contestOpen: true}]}, {$inc: {balance: value}}, function(err, data) {
+			console.log("inside of update");
+			console.log("err", err);
+			//maybe respond that it was successfully deleted
+		});
+
+	});
+
+	app.get('/api/gethistory', function(req, res) {
+		let userInfo = jwtDecode(req.cookies.token);
+		let userId = userInfo._id;
+
+		Contest.find({ $and: [{userId: userId}, {status: 'closed'}]}, function(err, data) {
+			res.json(data);
 		});
 	});
 
@@ -198,11 +322,13 @@ module.exports = function(app) {
 											name: null,
 											volume: null,
 											price: null,
-											value: null
+											value: null,
+											id: null
 										}]
 								}]);
 			}
 			else {
+				console.log("POSITION.FIND DATA--------------", data);
 				res.json(data);
 			}
 		});
@@ -210,10 +336,11 @@ module.exports = function(app) {
 
 	app.get('/api/getContestList', function(req, res) {
 		Contest.find({ $or: [{status: 'pending_but_can_make_trades'}, {status: 'pending_but_cannot_make_trades'}]}, function(err, data) {
-			console.log("data from get contest list", data);
 			res.json(data);
 		});
 	});
+
+
 
 
 	app.get('/api/getStockInfo/:query', function(req, res) {
@@ -254,17 +381,26 @@ module.exports = function(app) {
 			status: status,
 			contestants: []
 		}, function(err, data) {
-			console.log(data);
+			// console.log(data);
 
 		});
 		res.redirect("/");
 	});
 
 	app.get('/api/addstock', function(req, res) {
-		console.log("cookie", req.cookies);
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
-		console.log("user id", userId);
+	});
+
+	app.get('/api/accountbalance', function(req, res) {
+
+		let userInfo = jwtDecode(req.cookies.token);
+		let userId = userInfo._id;
+		User.findOne({_id: userId}, function(err, data) {
+			let accountBalance = data.accountBalance;
+			res.json(accountBalance);
+		});
+
 	});
 	/*
 		ROUTES TO MAKE:
@@ -303,6 +439,7 @@ function updateLeaderboard() {
 					}
 				}
 				console.log("userArray----------------",userArray);
+
 			});
 
 		}
