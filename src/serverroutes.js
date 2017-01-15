@@ -16,8 +16,7 @@ const download = require('download-file');
 
 module.exports = function(app) {
 
-	// updateLeaderboard();
-	updateLeaderboard2();
+	// updateLeaderboard()
 	// updateNASDAQ();
 
 
@@ -42,11 +41,17 @@ module.exports = function(app) {
 
 	*/
 
+
+
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
 		if ((day !== 0 || day !== 6) && (hourMin >= 9.75 && hourMin < 16)){
-			console.log('cron job running every 15 mins, mon-fri 9:45 - 4');
-			updateNYSE();
-			updateNASDAQ();
+			console.log("updating prices");
+			updateNYSE(function() {
+				updateNASDAQ(function() {
+					updateLeaderboard2();
+				});
+			});
+			
 		}
 
 	}, false);
@@ -84,14 +89,6 @@ module.exports = function(app) {
 
 	}, false);
 
-	var leaderUpdate = new CronJob('*/15 * * * *', function(){
-		console.log('cron job running every 15 mins to update leaderboard, mon-fri 10 - 4');
-		if ((day != 0 || day !=6) && (hourMin >= 10 && hour < 16)){
-			//update leaderboard
-		}
-
-	}, false);
-
 	//update leaderboard cron job
 	//switch all positions to closed cron job
 
@@ -99,7 +96,7 @@ module.exports = function(app) {
 	makeActive.start();
 	makeTradeable.start();
 	closeActive.start();
-	leaderUpdate.start();
+	// leaderUpdate.start();
 	//updateleaderboard start();
 	//close positions start();
 
@@ -214,7 +211,12 @@ module.exports = function(app) {
 	
 		Entries.findOne({ $and: [{userId: userId}, {contestId: contest}, {contestOpen: true}]}, function(err, data) {
 			console.log("inside of contest get cash");
-			res.json(data.balance);
+			if (data == null) {
+				res.json(5000);
+			}
+			else {
+				res.json(data.balance);
+			}
 		});
 	});
 
@@ -545,7 +547,7 @@ function updateLeaderboard2() {
 	// });
 }
 
-function updateNYSE() {
+function updateNYSE(cb) {
 
 var price;
 
@@ -570,7 +572,10 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 					// console.log("price", price);
 					// console.log("jsonObj.LastSale", jsonObj.LastSale);
 					// console.log("ticker", jsonObj.Symbol);
-					if (data.length > 0) {
+					if (data == null || undefined) {
+						//do nothing
+					}
+					else {
 						// console.log("PRICE RIGHT BEFORE I SEND IT-----------", price);
 						// console.log("JSONOBJ>LASTSALE RIGHT BEFORE I SEND IT-----------", jsonObj.LastSale);
 						handlePositionUpdate(jsonObj.LastSale, data);
@@ -578,15 +583,17 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 				});		
 			})
 			.on('done', (error) => {
+				cb();
 				console.log("error----------------", error);
-			});
 
 			});
 
+			});
+		
 
 }
 
-function updateNASDAQ() {
+function updateNASDAQ(cb) {
 
 let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NASDAQ&render=download";
 		let options = {
@@ -611,7 +618,10 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 				// console.log("price", price);
 				// console.log("jsonObj.LastSale", jsonObj.LastSale);
 				// console.log("ticker", jsonObj.Symbol);
-				if (data.length > 0) {
+				if (data == null || undefined) {
+					//do nothing
+				}
+				else {
 					// console.log("PRICE RIGHT BEFORE I SEND IT-----------", price);
 					// console.log("JSONOBJ>LASTSALE RIGHT BEFORE I SEND IT-----------", jsonObj.LastSale);
 					handlePositionUpdate(jsonObj.LastSale, data);
@@ -619,6 +629,7 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 			});		
 		})
 		.on('done', (error) => {
+			cb();
 			console.log("error----------------", error);
 		});
 
@@ -647,8 +658,6 @@ function handleLeader(user, sums) {
 }
 
 function handlePositionUpdate(price, positions) {
-	console.log("price inside of handlePositionUpdate", price);
-	console.log("positions inside of handlePositionUpdate", positions);
 	for (i = 0; i < positions.length; i++) {
 		console.log('positions['+i+']',positions[i]);
 			Position.update({_id: positions[i]._id}, {'position.price': price, 'position.value': price*positions[i].position.volume}, function(err, data) {

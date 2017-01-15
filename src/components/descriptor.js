@@ -6,6 +6,7 @@ export default class Descriptor extends React.Component {
 
 		let contest = this.props.location.pathname.split('/')[2];
 		this.props.closeEntry(contest);
+		window.location.reload(true);
 	}
 
 	componentWillMount() {
