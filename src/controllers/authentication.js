@@ -15,6 +15,7 @@ function setUserInfo(request) {
   return {
     _id: request._id,
     email: request.email,
+    username: request.username
   };
 }
 
@@ -41,6 +42,7 @@ function setUserInfo(request) {
     // Check for registration errors
     const email = req.body.email;
     const password = req.body.password;
+    const username = req.body.username;
 
     // Return error if no email provided
     if (!email) {
@@ -50,6 +52,10 @@ function setUserInfo(request) {
     // Return error if no password provided
     if (!password) {
       return res.status(422).send({ error: 'You must enter a password.' });
+    }
+
+    if (!username) {
+      return res.status(422).send({ error: 'You must enter a username.' });
     }
 
     User.findOne({ email: email }, function(err, existingUser) {
@@ -63,7 +69,8 @@ function setUserInfo(request) {
         // If email is unique and password was provided, create account
         let user = new User({
           email: email,
-          password: password
+          password: password,
+          username: username
         });
 
         user.save(function(err, user) {

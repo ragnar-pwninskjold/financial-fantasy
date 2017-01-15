@@ -1,21 +1,28 @@
+
+
 .navigation {
-	background-color: red;
-	height: 30px;
+	height: 50px;
+}
+
+body {
+	font-family: 'Proza Libre', sans-serif;
+	margin: 0px;
+	margin-top: -17px;
 }
 
 .contest-container {
-	background-color: blue;
 	height: 500px;
 }
 
 .contest-table-container {
-	background-color: green;
+	margin-top: 45px;	
 }
 
-.contest-table {
-	background-color: yellow;
+.contest-table, .single-contest-table, .active-contest-table, .leaderboard-table, .transactions-table {
 	margin: 0 auto;
 	width: 60%;
+	border: 2.5px solid #E8130C;
+	padding-bottom: 15px;
 }
 
 .make-your-own {
@@ -23,19 +30,16 @@
 }
 
 .descriptor {
-	background-color: blue;
 }
 
 .contest-left {
-	background-color: yellow;
 	float: left;
 	height: 50px;
 	width: 50%;
 }
 
 .contest-right {
-	background-color: green;
-	float: left;
+	float: right;
 	height: 50px;
 	width: 40%;
 	margin-left: 75px;
@@ -47,15 +51,16 @@
 	margin: 0 auto;
 }
 
-.contest-name-hover:hover {
-	color: blue;
-	text-decoration: underline;
-}
-
 .navbar li {
 	display: inline;
 	float: left;
-	width: 20%;
+	width: 16.5%;
+}
+
+.navbar li a {
+	color: white;
+	font-size: 30px;
+	font-weight: bold;
 }
 
 a {
@@ -65,6 +70,11 @@ a {
 
 .navbar {
 	width: 100%;
+}
+
+.navigation {
+	background-color: #FF0000;
+	color: white;
 }
 
 .stocks, .history, .leader-board {
@@ -91,7 +101,6 @@ a {
 
 .rowdata {
 	width: 33%;
-	background-color: red;
 }
 
 .sorters {
@@ -128,13 +137,11 @@ a {
 
 
 .toggle-div-shown {
-	background-color: green;
 	height: 200px;
 	width: 200px;
 }
 
 .toggle-div-hidden {
-	background-color: red;
 	height: 200px;
 	width: 200px;
 }
@@ -144,7 +151,6 @@ input[type=text] {
     width: 130px;
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
-    float: right;
 }
 
 /* When the input field gets focus, change its width to 100% */
@@ -160,12 +166,120 @@ input[type=text]:focus {
 	float: right;
 }
 
+.active-hover:hover {
+	cursor: pointer;
+	text-decoration: underline;
+	color: #f44336;
+}
+
+button {
+    background-color: #f44336;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+tr {
+	text-align: center;
+}
+
+.logo img {
+	width: 80px;
+}
+
+.funds-title, .funds-amount {
+	text-align: center;
+	font-size: 6.0rem;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+.contest-table-title {
+	font-size: 3rem;
+	text-align: center;
+}
+
+.active-contest-intro {
+	text-align: center;
+	font-size: 5.0rem;
+}
+
+.history-table-title {
+	font-size: 5.0rem;
+	text-align: center;
+}
+
+th {
+    color: #f44336;
+    line-height: 41.5px;
+}
+
+tbody {
+	border-collapse: collapse;
+}
+
+.button-space {
+	background-color: white;
+}
 
 
 
+form {margin-top: 50px;}
 
+.submitButton {
+	background-color: #f44336;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
 
+.register-redirect:hover {
+	cursor: pointer;
+	text-decoration: underline;
+	color: #f44336;
+}
 
+.register-redirect {
+	text-align: center;
+}
+
+.main-login-div, .main-register-div {
+	width: 50%;
+	margin: 0 auto;
+	border: 2.5px solid #E8130C;
+	padding-bottom: 15px;
+	padding-top: 15px;
+	border-radius: 20px;
+	margin-top: 50px;
+}
+
+.auth-div {
+	text-align: center;
+}
+
+.button-container {
+	width: 100%;
+}
+
+.btn.btn-primary {
+	width: 130px;
+	margin: 25px auto;
+	display: block;
+}
+
+.auth-labels {
+	font-size: 3.0rem;
+}
 
 
 

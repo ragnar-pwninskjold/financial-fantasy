@@ -19,7 +19,7 @@ export default class SingleContestTable extends React.Component {
 							<th className="company-name">Company Name</th>
 							<th className="share-number"># of shares</th>
 							<th className="price">Price</th>
-							<th className="current-value">Current Value</th>
+							<th className="current-value">Value</th>
 						</tr>
 						{Object.keys(this.props.singleContestPositions[0]).map((i) => <SingleContestTableRow {...this.props} key={i} i={i} />)}
 
@@ -35,7 +35,7 @@ export default class SingleContestTable extends React.Component {
 							<th className="company-name">Company Name</th>
 							<th className="share-number"># of shares</th>
 							<th className="price">Price</th>
-							<th className="current-value">Current Value</th>
+							<th className="current-value">Value</th>
 							<th className="delete-button-single-contest-header"></th>
 						</tr>
 						{Object.keys(this.props.singleContestPositions[0]).map((i) => <SingleContestTableRow {...this.props} key={i} i={i} />)}

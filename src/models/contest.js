@@ -11,8 +11,9 @@ var contestSchema = mongoose.Schema({
 	leaderBoard: [{}],
 	status: String,
 	contestType: String,
-	contestants: [String] //each contestant should have cash value for this contest
-	//use the default ObjectId as the unique identifier
+	contestants: [{}],
+	requestingUser: String
+	
 },
 {
 	timestamps: true

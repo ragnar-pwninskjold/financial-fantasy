@@ -24,11 +24,11 @@ import receiveEntryClose from './data/receiveEntryCloseData';
 const defaultState = {
 	test1,
 	contestTableTest,
-	activeData,
+	// activeData,
 	receiveHistoryData,
 	historyTable,
 	leaderboard,
-	searchYield,
+	// searchYield,
 	singleContestPositions,
 	receiveCash,
 	receiveAcctBal,

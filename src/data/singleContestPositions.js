@@ -3,13 +3,13 @@ const singleContestPositions = [
 'companyName': 'Apple, Inc.',
 'shareVolume': '500',
 'value': '10000',
-'position': [{
+'position': {
 	name: null,
 	volume: null,
 	price: null,
 	value: null, 
 	id: null
-}]
+}
 }],
 {
 'companyName': 'Microsoft',

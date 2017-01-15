@@ -17,6 +17,8 @@ const download = require('download-file');
 module.exports = function(app) {
 
 	// updateLeaderboard();
+	updateLeaderboard2();
+	// updateNASDAQ();
 
 
 	let date = new Date();
@@ -25,6 +27,8 @@ module.exports = function(app) {
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
 	console.log("hourMin", hourMin);
+
+
 
 	/*
 
@@ -39,8 +43,8 @@ module.exports = function(app) {
 	*/
 
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
-		console.log('cron job running every 15 mins, mon-fri 9:45 - 4');
 		if ((day !== 0 || day !== 6) && (hourMin >= 9.75 && hourMin < 16)){
+			console.log('cron job running every 15 mins, mon-fri 9:45 - 4');
 			updateNYSE();
 			updateNASDAQ();
 		}
@@ -99,6 +103,23 @@ module.exports = function(app) {
 	//updateleaderboard start();
 	//close positions start();
 
+	app.get('/api/contests/changestatus/:id/:status', function(req, res) {
+		let contest = req.params.id;
+		let status = req.params.status;
+		Contest.findOneAndUpdate({_id: contest}, {status: status}, function(err, data) {
+			console.log("inside of the findOneAndUpdate for the special url");
+		});
+	});
+
+	app.get('/api/getinfo/:contest', function(req, res) {
+		let contest = req.params.contest;
+
+		Contest.findOne({_id: contest}, function(err, data) {
+			console.log("DATA FROM INSIDE OF GETINFO CONTEST", data);
+			res.json(data);
+		});
+	});
+
 	app.post('/api/contests/:contestid/buy/:stock', function(req, res) {
 		let contest = req.params.contestid;
 		let stock = req.params.stock;
@@ -107,14 +128,13 @@ module.exports = function(app) {
 		let userId = userInfo._id;
 
 
+
 		Entries.findOne({ $and: [{userId: userId}, {contestOpen: true}, {contestId: contest}]}, function(err, data) {
-			console.log("data from inside Entries.find", data);
 			if (data.entryStatus == 'closed') {
 				console.log("BECAUSE IT WAS CLOSED");
 				res.json("ENTRY_CLOSED");
 			}
 			else {
-			console.log("DATA--------------", data);
 			var balance = data.balance;
 			if (!err) {
 				Company.findOne({ticker: stock}, function(err, data) {
@@ -143,6 +163,7 @@ module.exports = function(app) {
 							});
 						}
 						else {
+							console.log("WASNT ENOUGH FUNDS");
 							res.json("NOT_ENOUGH_FUNDS");
 						}
 						
@@ -169,10 +190,20 @@ module.exports = function(app) {
 
 	app.get('/api/contests/active', function(req, res) {
 		let userInfo = jwtDecode(req.cookies.token);
+		console.log("USER INFO", userInfo);
 		let userId = userInfo._id;
-		console.log("user id", userId);
-		Contest.find({ $and: [{'contestants': userId}, {status: 'active'}]}, function(err, data) {
+		Contest.find({ $and: [{'contestants.userId': userId}, {status: 'active'}]}, function(err, data) {
+			var data = data;
+			console.log("DATA BEFORE REQUESTING THE USER", data);
+			console.log("DATA[0] BEFORE REQUESTING THE USER", data[0]);
+			if (data.length == 0) {
+				res.json(data);
+			}
+			else {
+			data[0].requestingUser = userId;
+			console.log("DATA[0] AFTER REQUESTING THE USER", data[0]);
 			res.json(data);
+			}
 		});
 	});
 
@@ -202,45 +233,49 @@ module.exports = function(app) {
 		}, function(err, data) {
 			console.log("err in entry create------", err);
 		});
-		Contest.update({'_id': contestId}, {$push: {contestants: userId}}, function(err, data) {
-			console.log("err in pushing user to contest----", err);
-			console.log("data from pushing to user to contest----", data);
-		});
 	});
 
 	app.post('/api/entry/close/:contest', function(req, res) {
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
+		let username = userInfo.username;
 		let contestId = req.params.contest;
 		var contestBuyIn;
 		var userBalance;
-		User.findOne({_id: userId}, function(err, data) {
-			console.log("data inside of the User.find -------------------", data)
-			userBalance = data.accountBalance;
-			Contest.findOne({_id: contestId}, function(err, data) {
-				contestBuyIn = data.buyIn;
-				console.log("data inside of contest.find----------------", data);
-				if (userBalance - contestBuyIn < 0) {
-					throw new Error('TEST!');
-					res.json("NOT_ENOUGH_ACCOUNT_FUNDS");
-					return;
-				}
-				else {
-					console.log("inside of else statement ------------------------");
-					console.log("userBalance", userBalance);
-					console.log("contestBuyIn", contestBuyIn);
-					var newBalance = userBalance - contestBuyIn;
-					console.log("newBalance", newBalance);
-					User.update({_id: userId}, {accountBalance: newBalance}, function(err, data) {
-						//do nothing
+		Contest.findOne({ $and: [{_id: contestId}, {'contestants.userId': userId}]}, function(err, data) {
+			if (data != null) {
+				console.log("right inside of the first if --- - - - - - - - --- ");
+				res.json("ALREADY_ENTERED");
+			}
+			else {
+				User.findOne({_id: userId}, function(err, data) {
+					userBalance = data.accountBalance;
+
+					Contest.findOne({_id: contestId}, function(err, data) {
+						contestBuyIn = data.buyIn;
+						if (userBalance - contestBuyIn < 0) {
+							throw new Error('TEST!');
+							res.json("NOT_ENOUGH_ACCOUNT_FUNDS");
+							return;
+						}
+						else {
+							var newBalance = userBalance - contestBuyIn;
+							User.update({_id: userId}, {accountBalance: newBalance}, function(err, data) {
+								//do nothing
+							});
+						}
 					});
-				}
-			});
+				});
+				Contest.update({'_id': contestId}, {$push: {contestants: {userId, username}}}, function(err, data) {
+					console.log("err in pushing user to contest----", err);
+				});
+				Entries.findOneAndUpdate({ $and: [{userId: userId}, {contestId: contestId}, {entryStatus: 'pending'}]}, {entryStatus: 'closed'}, function(err, data) {
+					console.log("error in closing contest-------", err);
+					res.json("CLOSED");
+				});
+			}
 		});
-		Entries.findOneAndUpdate({ $and: [{userId: userId}, {contestId: contestId}, {entryStatus: 'pending'}]}, {entryStatus: 'closed'}, function(err, data) {
-			console.log("error in closing contest-------", err);
-			res.json("CLOSED");
-		});
+		
 	});
 
 	app.get('/api/getMessages/:contest', function(req, res) {
@@ -248,12 +283,10 @@ module.exports = function(app) {
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
 		Contest.findOne({_id: contest}, function(err, data) {
-			console.log("data in getMessage -----------------", data);
 			var status = data.status;
 			Entries.findOne({ $and: [{contestId: contest}, {userId: userId}]}, function(err, data) {
 				var entryStatus = data.entryStatus;
-				console.log("status inside of getMessages", status);
-				console.log("status inside of Entries inside of get Messages", entryStatus);
+			
 				if (status == 'pending_but_cannot_make_trades') {
 					res.json("PENDING_NO_TRADES");
 				}
@@ -274,13 +307,6 @@ module.exports = function(app) {
 				}
 			});
 		})
-		/*
-		OPTIONS:
-		1. pending_but_cannot_make_trades (market is active)
-		2. ENTRY_CLOSED
-		3. CONTEST_CLOSED
-		4. Actiev
-		*/
 	});
 
 	app.put('/api/position/delete/:id', function(req, res) {
@@ -305,8 +331,21 @@ module.exports = function(app) {
 		let userInfo = jwtDecode(req.cookies.token);
 		let userId = userInfo._id;
 
-		Contest.find({ $and: [{userId: userId}, {status: 'closed'}]}, function(err, data) {
+		Contest.find({ $and: [{'contestants.userId': userId}, {status: 'closed'}]}, function(err, data) {
+			// console.log("DATA FROM API/GETHISTORY----------", data);
+			if (data.length == 0) {
+				res.json(data);
+			}
+			else {
+			data[0].requestingUser = userId;
+			console.log("DATA[0] AFTER REQUESTING THE USER", data[0]);
 			res.json(data);
+			}
+			// var data = data;
+			// console.log("DATA[0] BEFORE REQUESTING THE USER", data[0]);
+			// data[0].requestingUser = userId;
+			// console.log("DATA[0] AFTER REQUESTING THE USER", data[0]);
+			// res.json(data);
 		});
 	});
 
@@ -328,7 +367,6 @@ module.exports = function(app) {
 								}]);
 			}
 			else {
-				console.log("POSITION.FIND DATA--------------", data);
 				res.json(data);
 			}
 		});
@@ -374,10 +412,10 @@ module.exports = function(app) {
 
 		Contest.create({
 			title: contestParameters.contestname,
-			participantCount: contestParameters.contestsize,
-			buyIn: contestParameters['buy-in'],
+			participantCount: contestParameters.size,
+			buyIn: contestParameters['buyin'],
 			contestType: contestParameters.contesttype,
-			prizeTotals: (contestParameters.contestsize*contestParameters['buy-in']),
+			prizeTotals: (contestParameters.size*contestParameters['buyin']),
 			status: status,
 			contestants: []
 		}, function(err, data) {
@@ -419,34 +457,97 @@ module.exports = function(app) {
 
 }
 
-function updateLeaderboard() {
+// function updateLeaderboard() {
 
-	Contest.find({status: 'active'}, function(err, data) {
-		console.log("data from inside updateLeaderboard", data);
-		for (var i = 0; i < data.length; i++) {
-			let contest = data[i]._id;
-			Position.find({$and: [{isOpen: true}, {contestId: contest}]}, function(err, data) {
-				console.log("position.find inside of updateLeaderboard", data);
-				var userArray = [];
-				for (var j = 0; j < data.length; j++) {
-					console.log("data i inside of Position.find, inside of update leaderBoard-----------------", j);
-					console.log("actual data inside of Position.find", data);
-					if (userArray.contains(data[j].userId)) {
-						continue;
-					}
-					else {
-						userArray.push(data[j].userId);
-					}
-				}
-				console.log("userArray----------------",userArray);
+// 	Contest.find({status: 'active'}, function(err, data) {
+// 		var contestArray = [];
+// 		for (var j = 0; j < data.length; j++) {
+			
+// 			if (contestArray.contains(data[j]._id)) {
+// 				continue;
+// 			}
+// 			else {
+// 				contestArray.push(data[j]._id);
+// 			}
+// 		}
 
-			});
+// 		console.log("contestArray", contestArray);
+
+// 		for (var i = 0; i < contestArray.length; i++) {
+// 			console.log("contestArray[i]",contestArray[i]);
+
+// 			Position.aggregate({ $match: 
+// 				{$and: [
+// 					{contestId: contestArray[i]}, {isOpen: true}
+// 				]
+// 				}
+// 				},
+// 				{$group: {
+// 					_id: "$userId",
+// 					totalValue: {$sum: "$position.value"}
+// 				}}, function(err, data) {
+// 					console.log("error inside of updating leaderboard", err);
+// 					console.log("data inside of updating leaderboard", data);
+// 				}	
+// 				);
+// 		}
+// 	});
+// }
+
+function updateLeaderboard2() {
+
+	Position.find({isOpen: true}, function(err, data) {
+		var userArray = [];
+		for (var j = 0; j < data.length; j++) {
+			if (userArray.contains(data[j].userId)) {
+				continue;
+			}
+			else {
+				userArray.push(data[j].userId);
+			}
+		}
+		for (var i = 0; i < userArray.length; i++) {
+			handleAggregate(i, userArray);
 
 		}
 	});
+
+	
+
+	// Contest.find({status: 'active'}, function(err, data) {
+	// 	console.log("data from inside updateLeaderboard", data);
+	// 	for (var i = 0; i < data.length; i++) {
+	// 		let contest = data[i]._id;
+	// 		Position.find({$and: [{isOpen: true}, {contestId: contest}]}, function(err, data) {
+	// 			console.log("position.find inside of updateLeaderboard", data);
+	// 			var userArray = [];
+	// 			for (var j = 0; j < data.length; j++) {
+	// 				console.log("data i inside of Position.find, inside of update leaderBoard-----------------", j);
+	// 				console.log("actual data inside of Position.find", data);
+	// 				if (userArray.contains(data[j].userId)) {
+	// 					continue;
+	// 				}
+	// 				else {
+	// 					userArray.push(data[j].userId);
+	// 				}
+	// 			}
+	// 			for (var k = 0; k < userArray.length; k++){
+
+	// 				Position.find({$and: [{isOpen: true}, {contestId: contest}, {userId: userArray[k]}]})
+	// 			}
+
+
+	// 			console.log("userArray----------------",userArray);
+
+	// 		});
+
+	// 	}
+	// });
 }
 
 function updateNYSE() {
+
+var price;
 
 let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NYSE&render=download";
 		let options = {
@@ -459,18 +560,30 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 		csv()
 		.fromFile('./files/nyse.xlsx')
 		.on('json', (jsonObj) => {
-			Company.update({ticker: jsonObj.Symbol},{
-				price: jsonObj.LastSale
-			}, function(err, data) {
-				//nothing
-				//need to update positions for value with new price
+			price = jsonObj.LastSale;
+				Company.update({ticker: jsonObj.Symbol}, {price: jsonObj.LastSale}, function(err, data) {
+					// console.log("updated");
+				});	
+				Position.find({ $and: [{isOpen: true}, {'position.name':jsonObj.Symbol}]}, function(err, data) {
+					// console.log("position found-----");
+					// console.log("found positions", data);
+					// console.log("price", price);
+					// console.log("jsonObj.LastSale", jsonObj.LastSale);
+					// console.log("ticker", jsonObj.Symbol);
+					if (data.length > 0) {
+						// console.log("PRICE RIGHT BEFORE I SEND IT-----------", price);
+						// console.log("JSONOBJ>LASTSALE RIGHT BEFORE I SEND IT-----------", jsonObj.LastSale);
+						handlePositionUpdate(jsonObj.LastSale, data);
+					}
+				});		
+			})
+			.on('done', (error) => {
+				console.log("error----------------", error);
 			});
-		})
-		.on('done', (error) => {
-			console.log("error----------------", error);
-		});
 
-		});
+			});
+
+
 }
 
 function updateNASDAQ() {
@@ -480,6 +593,7 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 			directory: "./files",
 			filename: "nasdaq.xlsx"
 		}
+		var price;
 
 		download(url, options, function(err) {
 			if (err) throw err
@@ -487,11 +601,22 @@ let url = "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=N
 		.fromFile('./files/nasdaq.xlsx')
 		.on('json', (jsonObj) => {
 			//nothing
-			Company.update({ticker: jsonObj.Symbol},{
-				price: jsonObj.LastSale
-			}, function(err, data) {
-				//nothing
-			});
+			price = jsonObj.LastSale;
+			Company.update({ticker: jsonObj.Symbol}, {price: jsonObj.LastSale}, function(err, data) {
+				// console.log("updated");
+			});	
+			Position.find({ $and: [{isOpen: true}, {'position.name':jsonObj.Symbol}]}, function(err, data) {
+				// console.log("position found-----");
+				// console.log("found positions", data);
+				// console.log("price", price);
+				// console.log("jsonObj.LastSale", jsonObj.LastSale);
+				// console.log("ticker", jsonObj.Symbol);
+				if (data.length > 0) {
+					// console.log("PRICE RIGHT BEFORE I SEND IT-----------", price);
+					// console.log("JSONOBJ>LASTSALE RIGHT BEFORE I SEND IT-----------", jsonObj.LastSale);
+					handlePositionUpdate(jsonObj.LastSale, data);
+				}
+			});		
 		})
 		.on('done', (error) => {
 			console.log("error----------------", error);
@@ -509,3 +634,119 @@ Array.prototype.contains = function(obj) {
     }
     return false;
 }
+
+function handleLeader(user, sums) {
+	// console.log("user id, inside handleLeader", user);
+	// console.log("sum by contest inside handleLeader", sums);
+	for (var i = 0; i < sums.length; i++) {
+		addUserToLeaderboard(user, sums[i]._id, sums[i].totalValue);
+	}
+	
+
+
+}
+
+function handlePositionUpdate(price, positions) {
+	console.log("price inside of handlePositionUpdate", price);
+	console.log("positions inside of handlePositionUpdate", positions);
+	for (i = 0; i < positions.length; i++) {
+		console.log('positions['+i+']',positions[i]);
+			Position.update({_id: positions[i]._id}, {'position.price': price, 'position.value': price*positions[i].position.volume}, function(err, data) {
+				if (err) {
+					console.log(err);
+				}
+			});
+		
+	}
+}
+
+function handleAggregate(i, userArray) {
+
+
+
+	Position.aggregate({ $match: 
+		{$and: [
+			{userId: userArray[i]}, {isOpen: true}
+		]
+		}
+		},
+		{$group: {
+			_id: "$contestId",
+			totalValue: {$sum: "$position.value"}
+		}}, function(err, data) {
+			// console.log("error inside of updating leaderboard", err);		
+			handleLeader(userArray[i], data); //doesn't work properly / doesn't pass in correct user
+		}	
+		);
+
+
+}
+
+function addUserToLeaderboard (user, contest, value) {
+	console.log("USER INSIDE OF ADD USER TO LEADERBOARD-------------------", user);
+	console.log("CONTEST INSIDE OF ADD USER TO LEADERBOARD-------------------", contest);
+	console.log("VALUE INSIDE OF ADD USER TO LEADERBOARD-------------------", value);
+
+	Contest.findOne({$and: [{_id: contest}, {'leaderBoard.user': user}, {status: 'active'}]}, function(err, data) {
+		if (data == null) {
+			console.log("inside of data null", data);
+			Contest.update({$and: [{_id: contest}, {status: 'active'}]}, {$push: {
+				leaderBoard: {
+					user, 
+					totalValue: value
+				}
+			}}, function(err, data) {
+				console.log("data", data);
+			});
+
+			Contest.update({$and: [{_id: contest}, {status: 'active'}]}, {$push: {
+				leaderBoard: {
+					"$each": [],
+					"$sort": {'totalValue': -1}
+				}
+			}}, function(err, data) {
+				console.log("data", data);
+			});
+		}
+		else {
+			Contest.update({$and: [{_id: contest}, {'leaderBoard.user': user}, {status: 'active'}]}, {
+				$set: {
+					"leaderBoard.$.totalValue": value
+				}
+			}, function(err, data) {
+				console.log("data after the update in the else - - - - - - - - ", data);
+
+			});
+			Contest.update({$and: [{_id: contest}, {status: 'active'}]}, {$push: {
+				leaderBoard: {
+					"$each": [],
+					"$sort": {'totalValue': -1}
+				}
+			}}, function(err, data) {
+				console.log("data", data);
+			});
+		}
+	});
+
+	// Contest.update({$and: [{_id: contest}, {'leaderBoard.user': user}, {status: 'active'}]}, {},
+	//  function(err, data) {
+	// 	console.log("data from adding user to leaderboard", data);
+	// });
+}
+
+// function calculateWinners() {
+// 	Contest.update({status: 'closed'}, {$push: {
+// 		$each: [],
+// 		$sort: 
+// 	}}, function(err, data) {
+
+// 	});
+// }
+
+
+
+
+
+
+
+

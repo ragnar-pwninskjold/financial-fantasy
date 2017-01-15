@@ -21,24 +21,26 @@ class myModalComponent extends Component {
       <div>
         <form action="/api/contestcreate" method="post" onSubmit={this.submit}>
         <label>
-          Contest name: <input className="modal-input-contest-name" type="text" name="contestname" />
+          Contest name: <br></br> <input className="modal-input-contest-name" type="text" name="contestname" />
         </label>
         <br></br>
         <label>
-          Contest buy-in: <input type="number" name="buy-in" />
+          Buy-In: <br></br>
+          <input type="radio" name="buyin" value="1" /> $1 <br></br>
+          <input type="radio" name="buyin" value="5" /> $5 <br></br>
+          <input type="radio" name="buyin" value="10" /> $10 <br></br>
+          <input type="radio" name="buyin" value="20" /> $20
         </label>
         <br></br>
         <label>
-          Contest size: <input type="number" name="contestsize" />
+          Contest Size: <br></br>
+          <input type="radio" name="size" value="2" /> 2 contestants <br></br>
+          <input type="radio" name="size" value="5" /> 5 contestants <br></br>
+          <input type="radio" name="size" value="10" /> 10 contestants <br></br>
         </label>
+        <br></br>       
         <br></br>
-        <label>
-          Contest type: 
-          <input type="radio" name="contesttype" value="daliy" /> Daily
-          <input type="radio" name="contesttype" value="weekly" /> Weekly
-        </label>
-        <br></br>
-        <input type="submit" value="Submit"></input>
+        <input type="submit" value="Submit" className="submitButton"></input>
         </form>
         <button
           type="button"

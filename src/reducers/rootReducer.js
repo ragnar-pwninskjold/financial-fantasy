@@ -7,7 +7,7 @@ import test1 from './testreducer';
 import contestTableTest from './contestTableTest';
 import toggleReducer from './toggleReducer';
 import activeData from './activeDataReducer';
-import historyData from './historyDataReducer';
+import receivedHistoryData from './historyDataReducer';
 import historyTable from './historyTableReducer';
 import leaderboard from './leaderboardReducer';
 import searchYield from './searchYieldReducer';
@@ -21,6 +21,7 @@ import receiveCash from './receiveCashReducer';
 import receiveAcctBal from './receiveAcctBal';
 import receiveEntryClose from './receiveEntryCloseReducer';
 import receiveMessages from './receiveMessagesReducer';
+import receivedInfo from './receiveInfoReducer';
 
 
 
@@ -28,14 +29,14 @@ import receiveMessages from './receiveMessagesReducer';
 
 //put the reducers into the combineReducers
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducers({ 
 	test1, 
 	contestTableTest, 
 	buyStock,
 	modals: modalReducer, 
 	toggleReducer,
 	activeData,
-	historyData,
+	receivedHistoryData,
 	historyTable,
 	leaderboard,
 	searchYield,
@@ -46,6 +47,7 @@ const rootReducer = combineReducers({
 	receiveAcctBal,
 	receiveEntryClose,
 	receiveMessages,
+	receivedInfo,
 	auth: authReducer,
 	form: formReducer, 
 	routing: routerReducer

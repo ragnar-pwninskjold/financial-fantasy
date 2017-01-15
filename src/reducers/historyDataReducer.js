@@ -1,12 +1,12 @@
-function historyData(state = [], action) {
+function receivedHistoryData(state = [], action) {
 
 	switch(action.type) {
-		case "HISTORY_DATA":
-			const test = action.test;
-			console.log(test);
+		case "RECEIVE_HISTORY_DATA":
+			const test = action.history;
+			console.log("HISTORY DATA", test);
 			return [[test], ...state];
 	}
 	return state;
 }
 
-export default historyData;
+export default receivedHistoryData;

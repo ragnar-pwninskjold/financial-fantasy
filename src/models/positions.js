@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var positionSchema = mongoose.Schema({
-	position: [{}],
+	position: Object,
 	userId: String,
 	contestId: String,
 	isOpen: Boolean

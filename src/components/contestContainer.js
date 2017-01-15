@@ -1,11 +1,16 @@
 import React from 'react';
 import ContestTable from './contestTable';
+import ContestTableTitle from './contestTableTitle';
+import CreateContestModal from './testModal';
+
+
 
 export default class ContestContainer extends React.Component {
 	render() {
 		return (
 			<div className="contest-container">
-				<h1> This will be the giant container for contests </h1>
+				<ContestTableTitle />
+				<CreateContestModal />
 				<ContestTable {...this.props}/>
 			</div>
 		)

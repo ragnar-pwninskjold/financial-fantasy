@@ -8,6 +8,12 @@ import Leaderboard from './leaderboard';
 
 export default class SingleContestContainer extends React.Component {
 
+	componentWillMount() {
+		let contest = this.props.location.pathname.split('/')[2];
+		this.props.getContestInfo(contest);
+
+	}
+
 	searchStock (e) {
 		e.preventDefault();
 		let searchTerm = this.refs.search.value;
@@ -27,7 +33,7 @@ export default class SingleContestContainer extends React.Component {
 							{/*<SingleContestHistory {...this.props} />*/}
 						</div>
 						<div className="contest-right">
-						<h1>This will be countdown to the contest beginning</h1>
+						<h1>Contests begin at 9:30 AM, Monday - Friday</h1>
 						</div>
 					</div>
 				</div>
@@ -44,7 +50,7 @@ export default class SingleContestContainer extends React.Component {
 							{/*<SingleContestHistory {...this.props} />*/}
 						</div>
 						<div className="contest-right">
-						<form onSubmit={this.searchStock.bind(this)}>
+						<form className="form-table" onSubmit={this.searchStock.bind(this)}>
 						<input type="text" name="search" placeholder="Search.." ref="search"></input>
 						</form>
 						<TransactionsTable {...this.props} />
@@ -64,7 +70,7 @@ export default class SingleContestContainer extends React.Component {
 							{/*<SingleContestHistory {...this.props} />*/}
 						</div>
 						<div className="contest-right">
-						<h1>This will be countdown timer to start of tradability when its pending but you can't trade yet</h1>
+						<h1>Sorry, you can't make trades here until the current trading day has ended</h1>
 						</div>
 					</div>
 				</div>
@@ -73,7 +79,7 @@ export default class SingleContestContainer extends React.Component {
 		else if (this.props.receivedMessage[0] == 'CONTEST_CLOSED') {
 			return (
 				<div>
-					<h1>End leaderboard for contest being over</h1>
+					<Leaderboard {...this.props}/>
 				</div>
 			)
 		}
@@ -88,7 +94,7 @@ export default class SingleContestContainer extends React.Component {
 							{/*<SingleContestHistory {...this.props} />*/}
 						</div>
 						<div className="contest-right">
-						<Leaderboard></Leaderboard>
+						<Leaderboard {...this.props}/>
 						</div>
 					</div>
 				</div>

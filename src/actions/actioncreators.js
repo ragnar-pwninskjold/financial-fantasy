@@ -9,7 +9,7 @@ const API_URL = 'http://localhost:7770/api';
 export const AUTH_USER = 'auth_user';  
 export const UNAUTH_USER = 'unauth_user';
 export const AUTH_ERROR = 'auth_error';
-export const PROTECTED_TEST = 'protected_test';
+export const PROTECTED_TEST = 'protected_test'; 
 
 
 
@@ -90,6 +90,16 @@ export function getActiveContests(){
       axios.get("/api/contests/active")
       .then(response=> {return response.data})
       .then(json=>dispatch(receiveActiveData(json)))
+    }
+}
+
+export function getContestInfo(contest){
+  return dispatch => {
+      dispatch(getInfo());
+
+      axios.get("/api/getinfo/"+contest)
+      .then(response=> {return response.data})
+      .then(json=>dispatch(receiveInfo(json)))
     }
 }
 
@@ -174,9 +184,9 @@ export function loginUser({ email, password }) {
     }
   }
 
-export function registerUser({ email, password }) {  
+export function registerUser({ email, password, username }) {  
   return function(dispatch) {
-    axios.post(`${API_URL}/auth/register`, { email, password })
+    axios.post(`${API_URL}/auth/register`, { email, password, username })
     .then(response => {
       console.log(response);
       cookie.save('token', response.data.token, { path: '/' });
@@ -361,7 +371,7 @@ export function getHistoryData() {
 
 export function receiveHistoryData(history) {
   return {
-    type: "RECIEVE_HISTORY_DATA",
+    type: "RECEIVE_HISTORY_DATA",
     history
   }
 }
@@ -402,6 +412,19 @@ export function getSingleContestPositions() {
 export function receiveSingleContestPositions(json) {
   return {
     type: "RECEIVE_SINGLE_CONTEST_POSITIONS",
+    json
+  }
+}
+
+export function getInfo() {
+  return {
+    type: "GET_INFO"
+  }
+}
+
+export function receiveInfo(json) {
+  return {
+    type: "RECEIVE_INFO",
     json
   }
 }

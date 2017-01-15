@@ -25,7 +25,7 @@ export default class TableRow extends React.Component {
 				<td>{this.props.contestTableTest[0][this.props.i].contestants.length}/ {this.props.contestTableTest[0][this.props.i].participantCount}</td>
 				<td>${this.props.contestTableTest[0][this.props.i].buyIn}</td>
 				<td>${this.props.contestTableTest[0][this.props.i].prizeTotals}</td>
-				<td><button onClick={this.handleClick.bind(this, "4")}>Enter Contest</button></td>
+				<td><button onClick={this.handleClick.bind(this, "4")}>View Contest</button></td>
 			</tr>
 		)
 	}

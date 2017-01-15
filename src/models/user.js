@@ -12,6 +12,11 @@ var userSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
   accountBalance: {type: Number, default: 500}
 },
 {
