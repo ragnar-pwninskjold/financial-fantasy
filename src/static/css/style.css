@@ -159,8 +159,8 @@ input[type=text]:focus {
 }
 
 .modal-input-contest-name {
-	float: left !important;
-}
+/*	float: left !important;
+*/}
 
 .cash-balance {
 	float: right;
