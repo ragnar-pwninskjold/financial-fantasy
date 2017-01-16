@@ -16,7 +16,7 @@ export default class Descriptor extends React.Component {
 	}
 
 	render() {
-		if (this.props.receivedMessage[0] == 'ACTIVE_CONTEST' || this.props.receivedMessage[0] == 'ENTRY_CLOSED') {
+		if (this.props.receivedMessage[0] == 'ACTIVE_CONTEST' || this.props.receivedMessage[0] == 'ENTRY_CLOSED' || this.props.receivedMessage[0] == 'PENDING_NO_TRADES') {
 			return (
 			<div className="descriptor">
 				<h1>Contest: {this.props.contestInfo[0].title}</h1>
