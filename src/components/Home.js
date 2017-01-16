@@ -1,6 +1,6 @@
 import React from 'react';
 import Navbar from './navBar';
-import ContestContainer from './ContestContainer';
+import ContestContainer from './contestContainer';
 
 export default class Home extends React.Component {
 	render() {
