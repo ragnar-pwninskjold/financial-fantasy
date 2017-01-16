@@ -206,7 +206,7 @@ export function logoutUser() {
     dispatch({ type: UNAUTH_USER });
     cookie.remove('token', { path: '/' });
 
-    window.location.href = CLIENT_ROOT_URL + '/login';
+    window.location.href = /*CLIENT_ROOT_URL +*/ './login';
   }
 }
 
