@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router';
 import cookie from 'react-cookie';  
 
 const CLIENT_ROOT_URL = 'https://mysterious-harbor-13851.herokuapp.com';
-const API_URL = CLIENT_ROOT_URL+'/api';
+const API_URL = 'https://mysterious-harbor-13851.herokuapp.com/api';
 // const CLIENT_ROOT_URL = 'http://localhost:7770';
 // const API_URL = 'http://localhost:7770/api';
 
