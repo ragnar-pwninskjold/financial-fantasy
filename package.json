@@ -4,7 +4,7 @@
   "description": "",
   "main": "routes.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/static/bundle.js",
     "build": "NODE_ENV=production node_modules/.bin/webpack -p"
   },
   "author": "",
