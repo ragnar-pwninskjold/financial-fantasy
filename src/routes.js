@@ -2,6 +2,7 @@ import React from 'react';
 import {Route, IndexRoute, Router, browserHistory} from 'react-router';
 import Index from './components/Index';
 import PageNotFound from './components/PageNotFound';
+import Home from './components/Home';
 import App from './components/App';
 import { render } from 'react-dom';
 import Main from './components/Main';
