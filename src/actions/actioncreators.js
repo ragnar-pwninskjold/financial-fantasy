@@ -174,7 +174,7 @@ export function loginUser({ email, password }) {
       console.log(response);
       cookie.save('token', response.data.token, { path: '/' });
       dispatch({ type: AUTH_USER });
-      window.location.href = /*CLIENT_ROOT_URL +*/ '/';
+      window.location.href = CLIENT_ROOT_URL + '/';
     })
     .catch((error) => {
     	console.log("error", error);
@@ -193,7 +193,7 @@ export function registerUser({ email, password, username }) {
       console.log(response);
       cookie.save('token', response.data.token, { path: '/' });
       dispatch({ type: AUTH_USER });
-      window.location.href = /*CLIENT_ROOT_URL +*/ '/';
+      window.location.href = CLIENT_ROOT_URL + '/';
     })
     .catch((error) => {
       errorHandler(dispatch, error.response, AUTH_ERROR)
@@ -206,7 +206,7 @@ export function logoutUser() {
     dispatch({ type: UNAUTH_USER });
     cookie.remove('token', { path: '/' });
 
-    window.location.href = /*CLIENT_ROOT_URL +*/ './login';
+    window.location.href = CLIENT_ROOT_URL + '/login';
   }
 }
 
