@@ -41,10 +41,15 @@ module.exports = function(app) {
 
 	*/
 
+	Position.update({}, {isOpen: false}, {multi: true}, function(err, data) {
+		console.log("closing all positions - - - - - - - -", data);
+	});
+
 
 
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
-		if ((day !== 0 || day !== 6) && (hourMin >= 9.75 && hourMin < 16)){
+		console.log("15 minute mark");
+		if ((day !== 0 || day !== 6) && (hourMin >= 9.5 && hourMin < 16)){
 			console.log("updating prices");
 			updateNYSE(function() {
 				updateNASDAQ(function() {
@@ -85,6 +90,9 @@ module.exports = function(app) {
 			if (err) {
 				console.log("errors in turning all active to closed----", err);
 			}
+		});
+		Position.update({}, {isOpen: false}, function(err, data) {
+			console.log("closing all positions - - - - - - - -", data);
 		});
 
 	}, false);
