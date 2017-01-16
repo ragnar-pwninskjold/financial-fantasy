@@ -3,7 +3,7 @@ import axios from 'axios';
 import { browserHistory } from 'react-router';  
 import cookie from 'react-cookie';  
 
-const CLIENT_ROOT_URL = '';
+const CLIENT_ROOT_URL = process.env.NODE_ENV;
 const API_URL = '/api';
 // const CLIENT_ROOT_URL = 'http://localhost:7770';
 // const API_URL = 'http://localhost:7770/api';
