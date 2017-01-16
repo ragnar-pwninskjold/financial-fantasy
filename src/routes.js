@@ -42,7 +42,6 @@ const routes = (
 					<Route path="/register" component={Register} />
 					<Route path="/login" component={Login} />
 					<Route path="/logout" component={Logout} />
-					{/*<Route path="/home" component={RequireAuth(Home)}></Route>*/}
 					<Route path="/contest/:contestid" component={RequireAuth(SingleContest)}></Route>
 					<Route path="/history" component={RequireAuth(History)}></Route>
 					<Route path="/active" component={RequireAuth(ActiveContests)}></Route>
