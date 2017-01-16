@@ -7,7 +7,7 @@ const Navbar = React.createClass({
 		return(
 			<div className="navigation">
 				<ul className="navbar">
-				<li className="logo"><img src="./css/sean-dollar.png"></img></li>
+				<li className="logo"><img src="/css/sean-dollar.png"></img></li>
 				<li><Link to="/">Home</Link></li>
 				<li><Link to="/active">Active</Link></li>
 				<li><Link to="/history">History</Link></li>
