@@ -43,9 +43,10 @@ class myModalComponent extends Component {
         <input type="submit" value="Submit" className="submitButton"></input>
         </form>
         <button
+          className="close-modal-button"
           type="button"
           onClick={this.removeThisModal.bind(this)}>
-          close
+          Close
         </button>
       </div>
     );
@@ -69,6 +70,6 @@ export default class CreateContestModal extends Component {
   }
   
   render() {
-    return <button onClick={this.addModal.bind(this)}>Create A Contest</button>;
+    return <button className="create-contest-button" onClick={this.addModal.bind(this)}>Create A Contest</button>;
   }
 }
