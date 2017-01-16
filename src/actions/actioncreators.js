@@ -174,7 +174,7 @@ export function loginUser({ email, password }) {
       console.log(response);
       cookie.save('token', response.data.token, { path: '/' });
       dispatch({ type: AUTH_USER });
-      window.location.href = CLIENT_ROOT_URL + '/';
+      window.location.href = /*CLIENT_ROOT_URL +*/ '/';
     })
     .catch((error) => {
     	console.log("error", error);
