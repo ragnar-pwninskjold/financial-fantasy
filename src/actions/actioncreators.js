@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router';
 import cookie from 'react-cookie';  
 
 const CLIENT_ROOT_URL = '';
-const API_URL = 'api';
+const API_URL = '/api';
 // const CLIENT_ROOT_URL = 'http://localhost:7770';
 // const API_URL = 'http://localhost:7770/api';
 
@@ -193,7 +193,7 @@ export function registerUser({ email, password, username }) {
       console.log(response);
       cookie.save('token', response.data.token, { path: '/' });
       dispatch({ type: AUTH_USER });
-      window.location.href = CLIENT_ROOT_URL + '/';
+      window.location.href = /*CLIENT_ROOT_URL +*/ '/';
     })
     .catch((error) => {
       errorHandler(dispatch, error.response, AUTH_ERROR)
