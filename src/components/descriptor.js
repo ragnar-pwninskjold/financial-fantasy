@@ -16,6 +16,7 @@ export default class Descriptor extends React.Component {
 	}
 
 	render() {
+		console.log()
 		if (this.props.receivedMessage[0] == 'ACTIVE_CONTEST' || this.props.receivedMessage[0] == 'ENTRY_CLOSED' || this.props.receivedMessage[0] == 'PENDING_NO_TRADES') {
 			return (
 			<div className="descriptor">
