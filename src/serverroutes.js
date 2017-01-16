@@ -41,9 +41,7 @@ module.exports = function(app) {
 
 	*/
 
-	Position.update({}, {isOpen: false}, {multi: true}, function(err, data) {
-		console.log("closing all positions - - - - - - - -", data);
-	});
+	
 
 
 

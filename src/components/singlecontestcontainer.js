@@ -51,7 +51,7 @@ export default class SingleContestContainer extends React.Component {
 						</div>
 						<div className="contest-right">
 						<form className="form-table" onSubmit={this.searchStock.bind(this)}>
-						<input type="text" name="search" placeholder="Search.." ref="search"></input>
+						<input className="searchYieldInput" type="text" name="search" placeholder="Search.." ref="search"></input>
 						</form>
 						<TransactionsTable {...this.props} />
 						</div>

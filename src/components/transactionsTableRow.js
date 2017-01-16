@@ -11,6 +11,7 @@ export default class SingleContestTable extends React.Component {
 		let volume = prompt("How many shares?");
 		this.props.buyStock(ticker, contest, volume);
 		this.props.retrieveSingleContestPositions(contest);
+		console.log("window.location", window.location);
 		window.location.reload(true);
 	}
 

@@ -281,6 +281,21 @@ form {margin-top: 50px;}
 	font-size: 3.0rem;
 }
 
+.form-table {
+	margin-top: 0px;
+}
+
+.searchYieldInput {
+	text-align: center;
+	    margin: 0 auto;
+	    display: block;
+}
+
+.commit {
+	margin-left: 58px;
+    margin-bottom: 15px;
+}
+
 
 
 
