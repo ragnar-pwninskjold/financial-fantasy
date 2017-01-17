@@ -26,6 +26,22 @@ module.exports = function(app) {
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
 
+	var keepServerAwake = new CronJob('*/1 * * * *', function(){
+		console.log("2 minute mark");
+		var req = unirest("POST", "https://calm-ridge-91733.herokuapp.com/awake");
+
+		req.headers({
+		  "postman-token": "b6543013-ab1d-0ca3-b931-c0e269ebc7f1",
+		  "cache-control": "no-cache"
+		});
+
+
+		req.end(function (res) {
+		  if (res.error) throw new Error(res.error);
+		});
+
+	}, false);
+
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
 		console.log("15 minute mark");
 		if ((day !== 0 || day !== 6) && (hourMin >= 9.5 && hourMin < 16)){
@@ -84,6 +100,7 @@ module.exports = function(app) {
 
 	//update leaderboard cron job
 	//switch all positions to closed cron job
+	keepServerAwake.start();
 	priceUpdate.start();
 	makeActive.start();
 	makeTradeable.start();
@@ -100,17 +117,17 @@ module.exports = function(app) {
 	// 	});
 	// });
 
+	app.post('/awake', function (req, res) {
+		console.log("pinged with awake");
+		res.json("success");
+	});
+
 	app.get('/api/getinfo/:contest', function(req, res) {
 		let contest = req.params.contest;
 
 		Contest.findOne({_id: contest}, function(err, data) {
 			res.json(data);
 		});
-	});
-
-	app.post('/awake', function (req, res) {
-		console.log("pinged with awake");
-		res.json("success");
 	});
 
 	app.post('/api/contests/:contestid/buy/:stock', function(req, res) {
