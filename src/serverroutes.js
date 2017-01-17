@@ -26,6 +26,11 @@ module.exports = function(app) {
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
 
+	var keepServerAwake = new CronJob('*/1 * * * *', function(){
+		console.log("1 minute mark");
+
+	}, false);
+
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
 		console.log("15 minute mark");
 		if ((day !== 0 || day !== 6) && (hourMin >= 9.5 && hourMin < 16)){
@@ -84,7 +89,7 @@ module.exports = function(app) {
 
 	//update leaderboard cron job
 	//switch all positions to closed cron job
-
+	keepServerAwake.start();
 	priceUpdate.start();
 	makeActive.start();
 	makeTradeable.start();
