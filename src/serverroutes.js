@@ -26,8 +26,8 @@ module.exports = function(app) {
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
 
-	var keepServerAwake = new CronJob('*/1 * * * *', function(){
-		console.log("1 minute mark");
+	var keepServerAwake = new CronJob('*/2 * * * *', function(){
+		console.log("2 minute mark");
 
 	}, false);
 
