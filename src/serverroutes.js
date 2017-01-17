@@ -26,21 +26,21 @@ module.exports = function(app) {
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
 
-	var keepServerAwake = new CronJob('*/1 * * * *', function(){
-		console.log("2 minute mark");
-		var req = unirest("POST", "https://calm-ridge-91733.herokuapp.com/awake");
+	// var keepServerAwake = new CronJob('*/1 * * * *', function(){
+	// 	console.log("2 minute mark");
+	// 	var req = unirest("POST", "https://calm-ridge-91733.herokuapp.com/awake");
 
-		req.headers({
-		  "postman-token": "b6543013-ab1d-0ca3-b931-c0e269ebc7f1",
-		  "cache-control": "no-cache"
-		});
+	// 	req.headers({
+	// 	  "postman-token": "b6543013-ab1d-0ca3-b931-c0e269ebc7f1",
+	// 	  "cache-control": "no-cache"
+	// 	});
 
 
-		req.end(function (res) {
-		  if (res.error) throw new Error(res.error);
-		});
+	// 	req.end(function (res) {
+	// 	  if (res.error) throw new Error(res.error);
+	// 	});
 
-	}, false);
+	// }, false);
 
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
 		console.log("15 minute mark");
@@ -100,7 +100,7 @@ module.exports = function(app) {
 
 	//update leaderboard cron job
 	//switch all positions to closed cron job
-	keepServerAwake.start();
+	// keepServerAwake.start();
 	priceUpdate.start();
 	makeActive.start();
 	makeTradeable.start();
@@ -277,6 +277,9 @@ module.exports = function(app) {
 				Contest.update({'_id': contestId}, {$push: {contestants: {userId, username}}}, function(err, data) {
 					console.log("err in pushing user to contest----", err);
 				});
+				Contest.update({'_id': contestId}, {$inc: {contestantsLength: 1}}, function(err, data) {
+					console.log("err in pushing user to contest----", err);
+				});
 				Entries.findOneAndUpdate({ $and: [{userId: userId}, {contestId: contestId}, {entryStatus: 'pending'}]}, {entryStatus: 'closed'}, function(err, data) {
 					console.log("error in closing contest-------", err);
 					res.json("CLOSED");
@@ -379,8 +382,20 @@ module.exports = function(app) {
 	});
 
 	app.get('/api/getContestList', function(req, res) {
-		Contest.find({ $or: [{status: 'pending_but_can_make_trades'}, {status: 'pending_but_cannot_make_trades'}]}, function(err, data) {
-			res.json(data);
+		Contest.find({$or: [{status: 'pending_but_can_make_trades'}, {status: 'pending_but_cannot_make_trades'}]}, function(err, data) {
+			var newDataObj = data;
+			for (var i = 0; i < data.length; i++) {
+				if (newDataObj[i].contestants.length < newDataObj[i].participantCount) {
+					console.log("did nothing here", newDataObj);
+				}
+				else {
+					if (i > -1) {
+					    newDataObj.splice(i, 1);
+					    console.log("just spliced", newDataObj);
+					}
+				}
+			}
+			res.json(newDataObj);
 		});
 	});
 
@@ -423,7 +438,8 @@ module.exports = function(app) {
 			contestType: contestParameters.contesttype,
 			prizeTotals: (contestParameters.size*contestParameters['buyin']),
 			status: status,
-			contestants: []
+			contestants: [],
+			contestantsLength: 0
 		}, function(err, data) {
 			// console.log(data);
 

@@ -12,6 +12,7 @@ var contestSchema = mongoose.Schema({
 	status: String,
 	contestType: String,
 	contestants: [{}],
+	contestantsLength: Number,
 	requestingUser: String
 	
 },
