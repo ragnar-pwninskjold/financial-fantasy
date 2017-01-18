@@ -34,7 +34,7 @@ export default class HistoryRow extends React.Component {
 				winnings = 0;
 			}
 			else if (prizeCutOff > 1 && numberParticipating <= 5) {
-				if (contestants.length == 3) {
+				if (numberParticipating == 3) {
 					if (positionInContest+1 == 1) {
 						winnings = prizeTotals*0.6;
 					}
