@@ -109,7 +109,7 @@ module.exports = function(app) {
 			// console.log("closing all positions - - - - - - - -", data);
 		});
 
-		Contest.insert([
+		Contest.insertMany([
 			{title: 'The NASDAQians', 
 			participantCount: 10,
 			buyIn: 5,
