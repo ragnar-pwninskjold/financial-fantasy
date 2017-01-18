@@ -91,7 +91,7 @@ a {
 	margin: 0 auto;
 }
 
-.single-contest-table {
+.single-contest-table, .leaderboard-table {
 	width: 100%;
 }
 
