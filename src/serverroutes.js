@@ -109,6 +109,44 @@ module.exports = function(app) {
 			// console.log("closing all positions - - - - - - - -", data);
 		});
 
+		Contest.insert([
+			{title: 'The NASDAQians', 
+			participantCount: 10,
+			buyIn: 5,
+			prizetotals: 50,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'The NYSEians', 
+			participantCount: 10,
+			buyIn: 10,
+			prizetotals: 100,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'The Gultch', 
+			participantCount: 10,
+			buyIn: 20,
+			prizetotals: 200,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: '2Kewl4Skewl', 
+			participantCount: 2,
+			buyIn: 10,
+			prizetotals: 20,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'Think; Full', 
+			participantCount: 10,
+			buyIn: 10,
+			prizetotals: 100,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0}
+		]);
+
 	}, false);
 
 	//update leaderboard cron job
