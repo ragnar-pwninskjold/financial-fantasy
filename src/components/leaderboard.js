@@ -23,9 +23,9 @@ export default class Leaderboard extends React.Component {
 							<th className="value-header">Value</th>
 							<th className="position-header">Position</th>
 						</tr>
-						<tr>
+						
 							{this.props.contestInfo[0].leaderBoard.map((user, i) => <LeaderBoardRow {...this.props} key={i} i={i}/>)}
-						</tr>
+						
 
 					</table>
 				</div>
