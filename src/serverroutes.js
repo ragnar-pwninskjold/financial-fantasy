@@ -71,6 +71,17 @@ module.exports = function(app) {
 			if (err) {
 				console.log("errors in turning all contests active----", err);
 			}
+			var req = unirest("POST", "https://calm-ridge-91733.herokuapp.com/priceUpdate");
+
+			req.headers({
+			  "postman-token": "b6543013-ab1d-0ca3-b931-c0e269ebc7f1",
+			  "cache-control": "no-cache"
+			});
+
+
+			req.end(function (res) {
+			  if (res.error) throw new Error(res.error);
+			});
 		});
 
 	}, false);
