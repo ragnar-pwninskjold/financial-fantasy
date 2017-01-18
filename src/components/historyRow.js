@@ -22,8 +22,6 @@ export default class HistoryRow extends React.Component {
 			console.log("prizeTotals", prizeTotals);
 			let numberParticipating = this.props.history[0][0][this.props.i].contestants.length;
 			let prizeCutOff = numberParticipating*.5;
-			console.log("prizeCutOff", prizeCutOff);
-			console.log("positioninContest", positionInContest);
 
 			if (prizeCutOff == 1 && positionInContest+1 == 1) {
 				console.log("GOT INSIDE OF THE PROPER IF STATEMENT");
