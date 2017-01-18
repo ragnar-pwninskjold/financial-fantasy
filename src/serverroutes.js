@@ -93,7 +93,7 @@ module.exports = function(app) {
 			}
 		});
 		Position.update({}, {isOpen: false}, function(err, data) {
-			console.log("closing all positions - - - - - - - -", data);
+			// console.log("closing all positions - - - - - - - -", data);
 		});
 
 	}, false);
@@ -386,12 +386,12 @@ module.exports = function(app) {
 			var newDataObj = data;
 			for (var i = 0; i < data.length; i++) {
 				if (newDataObj[i].contestants.length < newDataObj[i].participantCount) {
-					console.log("did nothing here", newDataObj);
+					// console.log("did nothing here", newDataObj);
 				}
 				else {
 					if (i > -1) {
 					    newDataObj.splice(i, 1);
-					    console.log("just spliced", newDataObj);
+					    // console.log("just spliced", newDataObj);
 					}
 				}
 			}
