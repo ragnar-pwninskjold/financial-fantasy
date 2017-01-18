@@ -26,21 +26,21 @@ module.exports = function(app) {
 	let minutes = (date.getMinutes())/60;
 	let hourMin = minutes+hour;
 
-	// var keepServerAwake = new CronJob('*/1 * * * *', function(){
-	// 	console.log("2 minute mark");
-	// 	var req = unirest("POST", "https://calm-ridge-91733.herokuapp.com/awake");
+	var keepServerAwake = new CronJob('*/1 * * * *', function(){
+		console.log("2 minute mark");
+		var req = unirest("POST", "https://calm-ridge-91733.herokuapp.com/awake");
 
-	// 	req.headers({
-	// 	  "postman-token": "b6543013-ab1d-0ca3-b931-c0e269ebc7f1",
-	// 	  "cache-control": "no-cache"
-	// 	});
+		req.headers({
+		  "postman-token": "b6543013-ab1d-0ca3-b931-c0e269ebc7f1",
+		  "cache-control": "no-cache"
+		});
 
 
-	// 	req.end(function (res) {
-	// 	  if (res.error) throw new Error(res.error);
-	// 	});
+		req.end(function (res) {
+		  if (res.error) throw new Error(res.error);
+		});
 
-	// }, false);
+	}, false);
 
 	var priceUpdate = new CronJob('*/15 * * * *', function(){
 		console.log("15 minute mark");
@@ -100,7 +100,7 @@ module.exports = function(app) {
 
 	//update leaderboard cron job
 	//switch all positions to closed cron job
-	// keepServerAwake.start();
+	keepServerAwake.start();
 	priceUpdate.start();
 	makeActive.start();
 	makeTradeable.start();

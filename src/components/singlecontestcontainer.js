@@ -33,6 +33,7 @@ export default class SingleContestContainer extends React.Component {
 							{/*<SingleContestHistory {...this.props} />*/}
 						</div>
 						<div className="contest-right">
+						
 						<h1>Contests begin at 9:30 AM, Monday - Friday</h1>
 						</div>
 					</div>
