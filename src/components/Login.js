@@ -12,7 +12,9 @@ const form = reduxForm({
 
 class Login extends Component {  
   handleFormSubmit(formProps) {
+    console.log("form props", formProps);
     this.props.loginUser(formProps);
+
   }
 
   renderAlert() {
@@ -30,7 +32,11 @@ class Login extends Component {
   }
 
   render() {
-    const { handleSubmit } = this.props;
+    const { handleSubmit } = this.props;  
+    const demoData = {
+      'email': 'demo@demo.com',
+      'password': 'demo'
+    }
 
     return (
       <div className="main-login-div">
@@ -47,8 +53,10 @@ class Login extends Component {
           <div className="button-container">
           <button type="submit" className="btn btn-primary">Login</button>
           </div>
+        
         </form>
-        <h5 className="register-redirect"onClick={this.handleClick.bind(this)}>Or, click here to register</h5>
+        <h5 className="demo" onClick={handleSubmit(this.handleFormSubmit.bind(this, demoData))}>See a demo</h5>
+        <h5 className="register-redirect" onClick={this.handleClick.bind(this)}>Or, click here to register</h5>
       </div>
     );
   }

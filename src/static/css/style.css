@@ -238,13 +238,13 @@ tbody {
     margin-bottom: 5px;
 }
 
-.register-redirect:hover {
+.register-redirect:hover, .demo:hover {
 	cursor: pointer;
 	text-decoration: underline;
 	color: #f44336;
 }
 
-.register-redirect {
+.register-redirect, .demo {
 	text-align: center;
 }
 

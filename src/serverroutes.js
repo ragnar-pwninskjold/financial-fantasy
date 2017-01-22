@@ -15,6 +15,7 @@ const download = require('download-file');
 
 const unirest = require('unirest');
 
+
 module.exports = function(app) {
 
 
@@ -109,35 +110,35 @@ module.exports = function(app) {
 			{title: 'The NASDAQians', 
 			participantCount: 10,
 			buyIn: 5,
-			prizeTotals: contestantsLength*buyIn,
+			prizeTotals: 50,
 			status: 'pending_but_can_make_trades', 
 			contestants: [],
 			contestantsLength: 0},
 			{title: 'The NYSEians', 
 			participantCount: 10,
 			buyIn: 10,
-			prizeTotals: contestantsLength*buyIn,
+			prizeTotals: 100,
 			status: 'pending_but_can_make_trades', 
 			contestants: [],
 			contestantsLength: 0},
 			{title: 'The Gultch', 
 			participantCount: 10,
 			buyIn: 20,
-			prizeTotals: contestantsLength*buyIn,
+			prizeTotals: 200,
 			status: 'pending_but_can_make_trades', 
 			contestants: [],
 			contestantsLength: 0},
 			{title: '2Kewl4Skewl', 
 			participantCount: 2,
 			buyIn: 10,
-			prizeTotals: contestantsLength*buyIn,
+			prizeTotals: 20,
 			status: 'pending_but_can_make_trades', 
 			contestants: [],
 			contestantsLength: 0},
 			{title: 'Think; Full', 
 			participantCount: 10,
 			buyIn: 10,
-			prizeTotals: contestantsLength*buyIn,
+			prizeTotals: 100,
 			status: 'pending_but_can_make_trades', 
 			contestants: [],
 			contestantsLength: 0}
