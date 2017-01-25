@@ -81,6 +81,44 @@ module.exports = function(app) {
 			});
 		});
 
+		Contest.insertMany([
+			{title: 'Fee Fi Fo Fizzle', 
+			participantCount: 10,
+			buyIn: 5,
+			prizeTotals: 50,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'I <3 Bubble Economies', 
+			participantCount: 10,
+			buyIn: 10,
+			prizeTotals: 100,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'Mirak', 
+			participantCount: 10,
+			buyIn: 20,
+			prizeTotals: 200,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'Team Star Trek', 
+			participantCount: 2,
+			buyIn: 10,
+			prizeTotals: 20,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0},
+			{title: 'Team Star Wars', 
+			participantCount: 10,
+			buyIn: 10,
+			prizeTotals: 100,
+			status: 'pending_but_can_make_trades', 
+			contestants: [],
+			contestantsLength: 0}
+		]);
+
 	}, false);
 
 	var makeTradeable = new CronJob('00 15 16 * * 1-5', function(){
