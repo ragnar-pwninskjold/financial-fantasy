@@ -23,10 +23,11 @@ export default class Descriptor extends React.Component {
 			return (
 			<div className="descriptor">
 				<h1>Contest: {this.props.contestInfo[0].title}</h1>
+				<InstructionsModal />
 				<h3>Buy-In: {this.props.contestInfo[0].buyIn}</h3>
 				<h3>Prizes: {this.props.contestInfo[0].prizeTotals}</h3>
 				<h2 className="cash-balance">Cash: {this.props.cash[0].toString()}</h2>
-				<InstructionsModal />
+
 				<h3><br></br></h3>
 				
 				
@@ -37,11 +38,12 @@ export default class Descriptor extends React.Component {
 			return (
 			<div className="descriptor">
 				<h1>Contest: {this.props.contestInfo[0].title}</h1>
+				<InstructionsModal />
 				<h3>Buy-In: {this.props.contestInfo[0].buyIn}</h3>
 				<h3>Prizes: {this.props.contestInfo[0].prizeTotals}</h3>
 				<h2 className="cash-balance">Cash: {this.props.cash[0].toString()}</h2>
 				<button className="commit" onClick={this.handleClick.bind(this)}>Click to commit entry</button>
-				<InstructionsModal />
+				
 				
 			</div>
 		)
