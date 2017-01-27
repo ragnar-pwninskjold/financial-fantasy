@@ -3,6 +3,8 @@ import SingleContestTable from './singleContestTable';
 import TransactionsTable from './transactionsTable';
 import SingleContestHistory from './singleContestHistory';
 import Leaderboard from './leaderboard';
+import ContestOverlay from './contestOverlay';
+
 
 
 
@@ -22,6 +24,8 @@ export default class SingleContestContainer extends React.Component {
 	}
 
 	render() {
+
+
 		if (this.props.receivedMessage[0] == 'ENTRY_CLOSED') {
 			return (
 				<div>
@@ -41,12 +45,11 @@ export default class SingleContestContainer extends React.Component {
 			)
 		}
 		else if (this.props.receivedMessage[0] == 'GOOD_TO_TRADE') {
+			
 			return (
 				<div>
 					<div className="main-left-right-container">
 						<div className="contest-left">
-							
-						
 							<SingleContestTable {...this.props} />
 							{/*<SingleContestHistory {...this.props} />*/}
 						</div>
@@ -93,6 +96,7 @@ export default class SingleContestContainer extends React.Component {
 						
 							<SingleContestTable {...this.props} />
 							{/*<SingleContestHistory {...this.props} />*/}
+
 						</div>
 						<div className="contest-right">
 						<Leaderboard {...this.props}/>

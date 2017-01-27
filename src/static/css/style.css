@@ -299,4 +299,57 @@ tbody {
 	margin-left: 30px;
 }
 
+#outer-box {
+  width: 300px;
+  height: 194px;
+  display: block;
+  position: relative;
+}
+
+#outer-box img {
+  width: 300px;
+  height: auto;
+}
+
+#outer-box #inner-box {
+  background: #FD8698;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  position: absolute;
+  padding: 0;
+  transition: opacity .5s;
+}
+
+#outer-box #inner-box p {
+  color: #fff;
+  line-height: 150px;
+  font-family: 'arial';
+  text-align: center;
+}
+
+#outer-box:hover #inner-box {
+  opacity: .9;
+  transition: opacity .5s;
+}
+
+.instructions-modal-button {
+	float:right;
+}
+
+.overlay-pic {
+	max-width: 100%;
+	height: auto;
+}
+
+/*.modal-pic {
+	max-width: 100%;
+}*/
+
+.rrm-content {
+	max-width: 100%
+}
+
 

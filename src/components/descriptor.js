@@ -1,4 +1,5 @@
 import React from 'react';
+import InstructionsModal from './explanationModal';
 
 export default class Descriptor extends React.Component {
 
@@ -15,6 +16,7 @@ export default class Descriptor extends React.Component {
 		console.log("this, descriptor", this);
 	}
 
+
 	render() {
 		console.log()
 		if (this.props.receivedMessage[0] == 'ACTIVE_CONTEST' || this.props.receivedMessage[0] == 'ENTRY_CLOSED' || this.props.receivedMessage[0] == 'PENDING_NO_TRADES') {
@@ -24,7 +26,9 @@ export default class Descriptor extends React.Component {
 				<h3>Buy-In: {this.props.contestInfo[0].buyIn}</h3>
 				<h3>Prizes: {this.props.contestInfo[0].prizeTotals}</h3>
 				<h2 className="cash-balance">Cash: {this.props.cash[0].toString()}</h2>
+				<InstructionsModal />
 				<h3><br></br></h3>
+				
 				
 			</div>
 		)
@@ -37,6 +41,7 @@ export default class Descriptor extends React.Component {
 				<h3>Prizes: {this.props.contestInfo[0].prizeTotals}</h3>
 				<h2 className="cash-balance">Cash: {this.props.cash[0].toString()}</h2>
 				<button className="commit" onClick={this.handleClick.bind(this)}>Click to commit entry</button>
+				<InstructionsModal />
 				
 			</div>
 		)
