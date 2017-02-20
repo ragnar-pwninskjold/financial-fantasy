@@ -55,6 +55,10 @@ class Register extends Component {
 
   render() {
     const { handleSubmit } = this.props;
+     const demoData = {
+      'email': 'demo@demo.com',
+      'password': 'demo'
+    }
 
     return (
       <div className="main-register-div">
@@ -83,6 +87,7 @@ class Register extends Component {
         </div>
       </form>
       <h5 className="register-redirect" onClick={this.handleClick.bind(this)}>Have an account? Click here to login</h5>
+      <h5 className="demo" onClick={handleSubmit(this.handleFormSubmit.bind(this, demoData))}>See a demo</h5>
       </div>
     );
   }

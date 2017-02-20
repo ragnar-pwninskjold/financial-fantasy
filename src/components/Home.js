@@ -1,12 +1,12 @@
 import React from 'react';
-import Navbar from './navBar';
+import Navigation from './navBar';
 import ContestContainer from './contestContainer';
 
 export default class Home extends React.Component {
 	render() {
 		return (
 			<div>
-				<Navbar />
+				<Navigation />
 				<ContestContainer {...this.props} />
 			</div>
 		)

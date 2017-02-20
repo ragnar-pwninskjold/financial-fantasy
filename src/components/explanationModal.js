@@ -19,7 +19,7 @@ class myModalComponent extends Component {
   render() {
     return (
       <div>
-        <div className="modal-pic"><img className="overlay-pic" src="/css/contest_overlay.png"></img></div>
+        <div className="modal-pic"><img className="overlay-pic" src="/css/contes_overlay.jpg"></img></div>
         <button
           className="close-modal-button"
           type="button"
@@ -38,7 +38,7 @@ export default class InstructionsModal extends Component {
  
   addModal() {
     modal.add(myModalComponent, {
-      title: 'Create A Contest',
+      title: 'Enter A Contest',
       size: 'large', // large, medium or small,
       closeOnOutsideClick: false, // (optional) Switch to true if you want to close the modal by clicking outside of it,
       hideTitleBar: false, // (optional) Switch to true if do not want the default title bar and close button,
